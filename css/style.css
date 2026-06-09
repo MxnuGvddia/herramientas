@@ -99,6 +99,15 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--p
 #qrcode { display: flex; justify-content: center; margin-top: 16px; }
 #qrcode canvas, #qrcode img { max-width: 100%; }
 
+/* MD1 Truth Table */
+.truth-table { width: 100%; border-collapse: collapse; font-family: monospace; font-size: .85rem; margin-top: 8px; }
+.truth-table th, .truth-table td { border: 1px solid var(--border); padding: 6px 12px; text-align: center; }
+.truth-table th { background: var(--primary); color: white; font-weight: 600; }
+.truth-table td { background: white; }
+.truth-table td.tv { background: #d1fae5; color: #065f46; font-weight: 700; }
+.truth-table td.tf { background: #fee2e2; color: #991b1b; font-weight: 700; }
+.truth-table tr:nth-child(even) td:not(.tv):not(.tf) { background: #f9fafb; }
+
 /* Footer */
 .footer { margin-top: 48px; padding: 24px 0; border-top: 1px solid var(--border); text-align: center; }
 .footer-text { color: var(--muted); font-size: .8rem; margin-top: 16px; }

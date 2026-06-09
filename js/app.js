@@ -399,3 +399,209 @@ function asciiGen() {
   }
   $("ascii-output").textContent = lines.join("\n");
 }
+
+/* MD1 — Mate Discreta 1 */
+const MD1_OPS = { '¬': 4, '∧': 3, '∨': 2, '→': 1, '↔': 0 };
+
+function md1Tokenize(s) {
+  const t = []; let i = 0;
+  while (i < s.length) {
+    if (s[i] === ' ') { i++; continue; }
+    if ('()'.includes(s[i])) { t.push(s[i]); i++; continue; }
+    if (/[a-zA-Z]/.test(s[i])) { t.push(s[i]); i++; continue; }
+    if (s[i] === '-' && s[i+1] === '>') { t.push('→'); i += 2; continue; }
+    if (s[i] === '<' && s[i+1] === '-' && s[i+2] === '>') { t.push('↔'); i += 3; continue; }
+    const m = { '!': '¬', '~': '¬', '^': '∧', '|': '∨' };
+    if (m[s[i]]) { t.push(m[s[i]]); i++; continue; }
+    i++;
+  }
+  return t;
+}
+
+function md1ToPostfix(tokens) {
+  const out = [], stack = [];
+  for (const t of tokens) {
+    if (t === '(') { stack.push(t); continue; }
+    if (t === ')') {
+      while (stack.length && stack[stack.length-1] !== '(') out.push(stack.pop());
+      stack.pop(); continue;
+    }
+    if (t in MD1_OPS) {
+      while (stack.length && stack[stack.length-1] in MD1_OPS && MD1_OPS[stack[stack.length-1]] >= MD1_OPS[t]) out.push(stack.pop());
+      stack.push(t); continue;
+    }
+    out.push(t);
+  }
+  while (stack.length) out.push(stack.pop());
+  return out;
+}
+
+function md1EvalPF(postfix, vals) {
+  const stack = [];
+  for (const t of postfix) {
+    if (t in MD1_OPS) {
+      if (t === '¬') { stack.push(!stack.pop()); continue; }
+      const b = stack.pop(), a = stack.pop();
+      if (t === '∧') stack.push(a && b);
+      else if (t === '∨') stack.push(a || b);
+      else if (t === '→') stack.push(!a || b);
+      else if (t === '↔') stack.push((!a || b) && (!b || a));
+    } else if (t === 'V') stack.push(true);
+    else if (t === 'F') stack.push(false);
+    else stack.push(!!vals[t]);
+  }
+  return stack[0];
+}
+
+function md1Tab(tab) {
+  const c = $("md1-content");
+  if (tab === 'truth') c.innerHTML = `
+    <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
+    <p style="margin-bottom:8px">Ingresa una expresión lógica usando variables <b>p, q, r, s</b> y operadores <b>¬, ∧, ∨, →, ↔</b></p>
+    <div class="split">
+      <input type="text" id="md1-expr" value="(p∧q)→r" style="flex:1" placeholder="Ej: ¬p ∨ (q ∧ r)">
+      <button class="btn" onclick="md1Truth()">Generar Tabla</button>
+    </div>
+    <div class="presets" style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px">
+      <button class="btn btn-secondary" style="font-size:.8rem;padding:4px 8px" onclick="md1SetExpr('p∧q')">p∧q</button>
+      <button class="btn btn-secondary" style="font-size:.8rem;padding:4px 8px" onclick="md1SetExpr('p∨q')">p∨q</button>
+      <button class="btn btn-secondary" style="font-size:.8rem;padding:4px 8px" onclick="md1SetExpr('p→q')">p→q</button>
+      <button class="btn btn-secondary" style="font-size:.8rem;padding:4px 8px" onclick="md1SetExpr('p↔q')">p↔q</button>
+      <button class="btn btn-secondary" style="font-size:.8rem;padding:4px 8px" onclick="md1SetExpr('¬p∨q')">¬p∨q</button>
+      <button class="btn btn-secondary" style="font-size:.8rem;padding:4px 8px" onclick="md1SetExpr('(p∧q)→r')">(p∧q)→r</button>
+      <button class="btn btn-secondary" style="font-size:.8rem;padding:4px 8px" onclick="md1SetExpr('(p→q)∧(q→p)')">(p→q)∧(q→p)</button>
+    </div>
+    <div id="md1-truth-result" style="margin-top:12px"></div>
+    <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
+  `;
+  else if (tab === 'eval') c.innerHTML = `
+    <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
+    <p style="margin-bottom:8px">Asigna valores de verdad y evalúa una expresión</p>
+    <div class="split">
+      <div><label>p</label><select id="md1-ep"><option value="V">V</option><option value="F">F</option></select></div>
+      <div><label>q</label><select id="md1-eq"><option value="V">V</option><option value="F">F</option></select></div>
+      <div><label>r</label><select id="md1-er"><option value="F">F</option><option value="V">V</option></select></div>
+    </div>
+    <input type="text" id="md1-ee" value="(p∧q)→r" placeholder="Expresión">
+    <button class="btn" onclick="md1EvalProp()">Evaluar</button>
+    <div id="md1-eval-result" style="margin-top:12px"></div>
+    <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
+  `;
+  else if (tab === 'sets') c.innerHTML = `
+    <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
+    <p style="margin-bottom:8px">Operaciones entre dos conjuntos. Ingresa elementos separados por coma.</p>
+    <div class="split">
+      <div><label>Conjunto A</label><input type="text" id="md1-sa" value="1,2,3,4,5" placeholder="1,2,3,4,5"></div>
+      <div><label>Conjunto B</label><input type="text" id="md1-sb" value="4,5,6,7" placeholder="4,5,6,7"></div>
+    </div>
+    <div class="btn-group">
+      <button class="btn" onclick="md1SetOp('∪')">A ∪ B</button>
+      <button class="btn" onclick="md1SetOp('∩')">A ∩ B</button>
+      <button class="btn btn-secondary" onclick="md1SetOp('-')">A − B</button>
+      <button class="btn btn-secondary" onclick="md1SetOp('Δ')">A Δ B</button>
+    </div>
+    <div id="md1-sets-result" style="margin-top:12px"></div>
+    <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
+  `;
+  else if (tab === 'laws') c.innerHTML = `
+    <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
+    <div style="font-size:.85rem;line-height:1.8;overflow-x:auto">
+      <table class="truth-table">
+        <tr><th>Ley</th><th>Forma</th></tr>
+        <tr><td>Involución</td><td>¬¬p ≡ p</td></tr>
+        <tr><td>Idempotencia</td><td>p∧p ≡ p, &nbsp; p∨p ≡ p</td></tr>
+        <tr><td>Conmutativa</td><td>p∧q ≡ q∧p, &nbsp; p∨q ≡ q∨p</td></tr>
+        <tr><td>Asociativa</td><td>(p∧q)∧r ≡ p∧(q∧r), &nbsp; (p∨q)∨r ≡ p∨(q∨r)</td></tr>
+        <tr><td>Distributiva</td><td>p∧(q∨r) ≡ (p∧q)∨(p∧r), &nbsp; p∨(q∧r) ≡ (p∨q)∧(p∨r)</td></tr>
+        <tr><td>De Morgan</td><td>¬(p∧q) ≡ ¬p∨¬q, &nbsp; ¬(p∨q) ≡ ¬p∧¬q</td></tr>
+        <tr><td>Condicional</td><td>p→q ≡ ¬p∨q ≡ ¬q→¬p</td></tr>
+        <tr><td>Bicondicional</td><td>p↔q ≡ (p∧q)∨(¬p∧¬q) ≡ (p→q)∧(q→p)</td></tr>
+        <tr><td>Complemento</td><td>p∨¬p ≡ T, &nbsp; p∧¬p ≡ F</td></tr>
+        <tr><td>Dominante</td><td>p∨T ≡ T, &nbsp; p∧F ≡ F</td></tr>
+        <tr><td>Identidad</td><td>p∧T ≡ p, &nbsp; p∨F ≡ p</td></tr>
+        <tr><td>Absorción</td><td>p∧(p∨q) ≡ p, &nbsp; p∨(p∧q) ≡ p</td></tr>
+      </table>
+    </div>
+    <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
+  `;
+}
+
+function md1SetExpr(e) { $("md1-expr").value = e; md1Truth(); }
+
+function md1Truth() {
+  const expr = $("md1-expr").value.trim();
+  if (!expr) return;
+  const tokens = md1Tokenize(expr);
+  const pf = md1ToPostfix(tokens);
+  const vars = [...new Set(tokens.filter(t => /[a-z]/.test(t)))].sort();
+  if (vars.length > 4) { $("md1-truth-result").innerHTML = '<div class="result-box error">Máximo 4 variables (p,q,r,s)</div>'; return; }
+  const rows = 2 ** vars.length;
+  let html = '<table class="truth-table"><thead><tr>';
+  for (const v of vars) html += `<th>${v}</th>`;
+  html += `<th>${expr}</th></tr></thead><tbody>`;
+  for (let i = 0; i < rows; i++) {
+    const vals = {};
+    html += '<tr>';
+    for (let j = 0; j < vars.length; j++) {
+      vals[vars[j]] = !!(i & (1 << (vars.length - 1 - j)));
+      html += `<td>${vals[vars[j]] ? 'V' : 'F'}</td>`;
+    }
+    html += `<td class="${md1EvalPF(pf,vals) ? 'tv' : 'tf'}">${md1EvalPF(pf,vals) ? 'V' : 'F'}</td></tr>`;
+  }
+  html += '</tbody></table>';
+  const last = md1EvalPF(pf, Object.fromEntries(vars.map(v => [v, true])));
+  const tautology = rows > 0 && Array.from({length: rows}, (_, i) => {
+    const vals = {};
+    for (let j = 0; j < vars.length; j++) vals[vars[j]] = !!(i & (1 << (vars.length - 1 - j)));
+    return md1EvalPF(pf, vals);
+  }).every(Boolean);
+  if (tautology) html += '<div class="result-box" style="margin-top:8px;background:#d1fae5;color:#065f46">✅ Tautología: verdadero para todas las combinaciones</div>';
+  const contradiction = rows > 0 && Array.from({length: rows}, (_, i) => {
+    const vals = {};
+    for (let j = 0; j < vars.length; j++) vals[vars[j]] = !!(i & (1 << (vars.length - 1 - j)));
+    return md1EvalPF(pf, vals);
+  }).every(x => !x);
+  if (contradiction) html += '<div class="result-box" style="margin-top:8px;background:#fee2e2;color:#991b1b">❌ Contradicción: falso para todas las combinaciones</div>';
+  $("md1-truth-result").innerHTML = html;
+}
+
+function md1EvalProp() {
+  const expr = $("md1-ee").value.trim();
+  const vals = {
+    p: $("md1-ep").value === 'V',
+    q: $("md1-eq").value === 'V',
+    r: $("md1-er").value === 'V',
+  };
+  const tokens = md1Tokenize(expr);
+  const pf = md1ToPostfix(tokens);
+  const result = md1EvalPF(pf, vals);
+  $("md1-eval-result").innerHTML = `
+    <div class="result-box" style="text-align:center;font-size:1.3rem;padding:16px">
+      ${result ? '✅ Verdadero (V)' : '❌ Falso (F)'}
+    </div>
+    <div style="margin-top:8px;font-size:.85rem;color:var(--muted)">
+      p = ${vals.p ? 'V' : 'F'}, q = ${vals.q ? 'V' : 'F'}, r = ${vals.r ? 'V' : 'F'} &nbsp;|&nbsp; ${expr} = <strong>${result ? 'V' : 'F'}</strong>
+    </div>
+  `;
+}
+
+function md1SetOp(op) {
+  const a = $("md1-sa").value.split(',').map(x => x.trim()).filter(Boolean);
+  const b = $("md1-sb").value.split(',').map(x => x.trim()).filter(Boolean);
+  const setA = new Set(a), setB = new Set(b);
+  let result;
+  if (op === '∪') result = new Set([...setA, ...setB]);
+  else if (op === '∩') result = new Set([...setA].filter(x => setB.has(x)));
+  else if (op === '-') result = new Set([...setA].filter(x => !setB.has(x)));
+  else if (op === 'Δ') result = new Set([...setA].filter(x => !setB.has(x)).concat([...setB].filter(x => !setA.has(x))));
+  const arr = [...result].sort((a,b) => isNaN(a)||isNaN(b) ? String(a).localeCompare(b) : a-b);
+  $("md1-sets-result").innerHTML = `
+    <div class="split">
+      <div class="result-box"><b>A</b> = {${[...setA].join(', ')}} &nbsp; |A| = ${setA.size}</div>
+      <div class="result-box"><b>B</b> = {${[...setB].join(', ')}} &nbsp; |B| = ${setB.size}</div>
+    </div>
+    <div class="result-box" style="font-size:1.1rem;margin-top:8px">
+      <b>A ${op} B</b> = {${arr.join(', ')}} &nbsp; |A ${op} B| = ${arr.length}
+    </div>
+  `;
+}

@@ -299,6 +299,19 @@ const TOOLS = [
     init: () => {}
   },
   {
+    id: "md1", icon: "🧠", name: "Mate Discreta 1", desc: "Tablas de verdad, proposiciones, conjuntos — lógica proposicional",
+    render: () => `
+      <div class="tabs" style="display:flex;gap:4px;margin-bottom:16px;flex-wrap:wrap">
+        <button class="btn btn-secondary" style="flex:1" onclick="md1Tab('truth')">📋 Tabla de Verdad</button>
+        <button class="btn btn-secondary" style="flex:1" onclick="md1Tab('eval')">🔢 Evaluar Proposición</button>
+        <button class="btn btn-secondary" style="flex:1" onclick="md1Tab('sets')">📚 Operaciones Conjuntos</button>
+        <button class="btn btn-secondary" style="flex:1" onclick="md1Tab('laws')">📜 Leyes del Álgebra</button>
+      </div>
+      <div id="md1-content"></div>
+    `,
+    init: () => { md1Tab('truth'); }
+  },
+  {
     id: "ascii", icon: "🎭", name: "Arte ASCII", desc: "Convierte texto a arte ASCII",
     render: () => `
       <label>Texto (máx 10 caracteres)</label>

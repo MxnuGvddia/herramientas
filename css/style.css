@@ -92,14 +92,6 @@ body {
   -webkit-backdrop-filter: blur(12px);
 }
 
-/* Ad slots */
-.ad-placeholder {
-  background: rgba(255,255,255,.03); border-radius: 8px; padding: 12px; text-align: center;
-  color: rgba(255,255,255,.15); font-size: .75rem; border: 1px dashed rgba(255,255,255,.06);
-}
-.ad-banner { margin: 24px 0; min-height: 90px; }
-.ad-rect { min-height: 250px; margin-bottom: 24px; }
-
 /* Form elements */
 label { display: block; font-size: .9rem; font-weight: 600; margin-bottom: 6px; color: var(--text); }
 input, select, textarea {

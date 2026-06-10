@@ -138,6 +138,10 @@ function calcTab(tab) {
           <span style="padding:2px 6px;font-weight:600;color:var(--muted)">·</span>
           <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('Math.sin(x)')">sin(x)</button>
           <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('Math.cos(x)')">cos(x)</button>
+          <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('Math.tan(x)')">tan(x)</button>
+          <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('Math.asin(x)')">sin⁻¹(x)</button>
+          <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('Math.acos(x)')">cos⁻¹(x)</button>
+          <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('Math.atan(x)')">tan⁻¹(x)</button>
           <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('x*x*x')">x³</button>
           <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('Math.sqrt(x)')">√x</button>
           <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('Math.exp(x)')">eˣ</button>

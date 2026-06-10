@@ -3169,7 +3169,8 @@ function _bgInitParticles() {
       color: isBreathing ? breathColor : palette[Math.floor(Math.random() * palette.length)],
       alpha: Math.random() * 0.35 + 0.08,
       pulse: Math.random() * Math.PI * 2,
-      phase: Math.random() * Math.PI * 2
+      phase: Math.random() * Math.PI * 2,
+      driftX: 0, driftY: 0
     });
   }
 
@@ -3223,7 +3224,12 @@ function _bgInitParticles() {
     }
 
     for (const p of _bgParticles) {
-      p.x += p.vx; p.y += p.vy;
+      p.driftX += (Math.random() - 0.5) * 0.04;
+      p.driftY += (Math.random() - 0.5) * 0.04;
+      p.driftX = Math.max(-0.3, Math.min(0.3, p.driftX));
+      p.driftY = Math.max(-0.3, Math.min(0.3, p.driftY));
+      p.x += p.vx + p.driftX;
+      p.y += p.vy + p.driftY;
       if (p.x < -10) p.x = W + 10; if (p.x > W + 10) p.x = -10;
       if (p.y < -10) p.y = H + 10; if (p.y > H + 10) p.y = -10;
     }

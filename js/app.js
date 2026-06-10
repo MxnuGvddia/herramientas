@@ -104,6 +104,13 @@ function calcTab(tab) {
           <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="document.getElementById('graph-fx').value='Math.cos(x)';graphPlot()">cos(x)</button>
           <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="document.getElementById('graph-fx').value='x*x';graphPlot()">x²</button>
           <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="document.getElementById('graph-fx').value='1/x';graphPlot()">1/x</button>
+          <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="document.getElementById('graph-fx').value='Math.tan(x)';graphPlot()">tan(x)</button>
+          <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="document.getElementById('graph-fx').value='Math.sqrt(x)';graphPlot()">√x</button>
+          <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="document.getElementById('graph-fx').value='x*x*x';graphPlot()">x³</button>
+          <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="document.getElementById('graph-fx').value='Math.exp(x)';graphPlot()">eˣ</button>
+          <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="document.getElementById('graph-fx').value='Math.log(x)';graphPlot()">ln(x)</button>
+          <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="document.getElementById('graph-fx').value='Math.abs(x)';graphPlot()">|x|</button>
+          <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="document.getElementById('graph-fx').value='Math.sin(1/x)';graphPlot()">sin(1/x)</button>
         </div>
         <canvas id="graph-canvas" width="500" height="350"></canvas>
       </div>
@@ -248,6 +255,29 @@ function calcTab(tab) {
       <div style="font-size:.8rem;color:var(--muted)">
         V = I·R &nbsp;|&nbsp; Serie: R<sub>T</sub> = R₁ + R₂ + ... &nbsp;|&nbsp; Paralelo: 1/R<sub>T</sub> = 1/R₁ + 1/R₂ + ...
       </div>
+      <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:12px">
+        <p style="font-size:.9rem"><b>Código de colores — resistencia de 4 bandas</b></p>
+        <div class="split" style="gap:4px;margin-bottom:8px">
+          <div><label style="font-size:.7rem">1ª banda</label>
+            <select id="resistor-b1" onchange="resistorCalc()" style="width:100%;padding:4px">
+              <option value="0">Negro</option><option value="1" selected>Marrón</option><option value="2">Rojo</option><option value="3">Naranja</option><option value="4">Amarillo</option><option value="5">Verde</option><option value="6">Azul</option><option value="7">Violeta</option><option value="8">Gris</option><option value="9">Blanco</option>
+            </select></div>
+          <div><label style="font-size:.7rem">2ª banda</label>
+            <select id="resistor-b2" onchange="resistorCalc()" style="width:100%;padding:4px">
+              <option value="0">Negro</option><option value="1">Marrón</option><option value="2" selected>Rojo</option><option value="3">Naranja</option><option value="4">Amarillo</option><option value="5">Verde</option><option value="6">Azul</option><option value="7">Violeta</option><option value="8">Gris</option><option value="9">Blanco</option>
+            </select></div>
+          <div><label style="font-size:.7rem">Multiplicador</label>
+            <select id="resistor-mult" onchange="resistorCalc()" style="width:100%;padding:4px">
+              <option value="1">×1 (Negro)</option><option value="10">×10 (Marrón)</option><option value="100" selected>×100 (Rojo)</option><option value="1000">×1K (Naranja)</option><option value="10000">×10K (Amarillo)</option><option value="100000">×100K (Verde)</option><option value="1000000">×1M (Azul)</option><option value="10000000">×10M (Violeta)</option><option value="0.1">×0.1 (Dorado)</option><option value="0.01">×0.01 (Plateado)</option>
+            </select></div>
+          <div><label style="font-size:.7rem">Tolerancia</label>
+            <select id="resistor-tol" onchange="resistorCalc()" style="width:100%;padding:4px">
+              <option value="1">±1% (Marrón)</option><option value="2">±2% (Rojo)</option><option value="5" selected>±5% (Dorado)</option><option value="10">±10% (Plateado)</option><option value="20">±20% (Sin color)</option>
+            </select></div>
+        </div>
+        <div id="resistor-display" style="display:flex;gap:6px;justify-content:center;margin:12px 0;height:44px"></div>
+        <div id="resistor-result" class="result-box" style="text-align:center;font-size:1.2rem;font-weight:700">220 Ω ±5%</div>
+      </div>
     `,
     chem: `
       <p style="font-size:.9rem;margin-bottom:8px"><b>Química — Masa molar y estequiometría</b></p>
@@ -321,7 +351,7 @@ function calcTab(tab) {
   if (tab === 'graph') { setTimeout(() => { graphPlot(); }, 100); }
   if (tab === 'stat') { setTimeout(() => { calcStat(); }, 50); }
   if (tab === 'phys') { setTimeout(() => { physMRU(); physMRUV(); physMRUA(); }, 50); }
-  if (tab === 'elec') { setTimeout(() => { elecOhm(); elecSeries(); elecParalelo(); }, 50); }
+  if (tab === 'elec') { setTimeout(() => { elecOhm(); elecSeries(); elecParalelo(); resistorCalc(); }, 50); }
   if (tab === 'bases') { setTimeout(() => { baseConvert(10); }, 50); }
 }
 
@@ -551,8 +581,43 @@ function elecParalelo() {
   if (!isNaN(r1) && !isNaN(r2) && (r1 !== 0 || r2 !== 0)) $("elec-rp-total").value = ((1/r1 + 1/r2) > 0 ? 1 / (1/r1 + 1/r2) : 0).toFixed(4);
 }
 
+/* Resistor color code */
+const RES_COLORS = ['#000','#8B4513','#d00','#FF8C00','#FFD700','#228B22','#06f','#8B008B','#808080','#eee'];
+const RES_MULT_COLORS = {1:'#000',10:'#8B4513',100:'#d00',1000:'#FF8C00',10000:'#FFD700',100000:'#228B22',1000000:'#06f',10000000:'#8B008B',0.1:'#DAA520',0.01:'#C0C0C0'};
+const RES_TOL_COLORS = {1:'#8B4513',2:'#d00',5:'#DAA520',10:'#C0C0C0',20:'transparent'};
+function resistorCalc() {
+  const b1 = parseInt($("resistor-b1")?.value || 0);
+  const b2 = parseInt($("resistor-b2")?.value || 0);
+  const mult = parseFloat($("resistor-mult")?.value || 1);
+  const tol = parseFloat($("resistor-tol")?.value || 20);
+  const value = (b1 * 10 + b2) * mult;
+  let display;
+  if (value >= 1e6) display = (value / 1e6).toFixed(value >= 1e7 ? 0 : 1) + ' MΩ';
+  else if (value >= 1e3) display = (value / 1e3).toFixed(value >= 1e4 ? 0 : 1) + ' KΩ';
+  else if (value >= 1) display = value.toFixed(0) + ' Ω';
+  else display = (value * 1000).toFixed(0) + ' mΩ';
+  $("resistor-result").innerHTML = `<strong>${display}</strong> ±${tol}%`;
+  const disp = $("resistor-display");
+  disp.innerHTML = `
+    <div style="width:56px;height:44px;border-radius:4px;background:${RES_COLORS[b1]};border:1px solid #555"></div>
+    <div style="width:56px;height:44px;border-radius:4px;background:${RES_COLORS[b2]};border:1px solid #555"></div>
+    <div style="width:56px;height:44px;border-radius:4px;background:${RES_MULT_COLORS[mult]};border:1px solid #555"></div>
+    <div style="width:56px;height:44px;border-radius:4px;background:${RES_TOL_COLORS[tol]};border:1px solid #555"></div>
+  `;
+}
+
 /* Chemistry */
-const ATOMIC = { H:1, He:4, Li:7, Be:9, B:11, C:12, N:14, O:16, F:19, Ne:20, Na:23, Mg:24, Al:27, Si:28, P:31, S:32, Cl:35.5, K:39, Ca:40, Mn:55, Fe:56, Cu:64, Zn:65, Br:80, Ag:108, I:127, Ba:137, Pt:195, Au:197, Hg:201, Pb:207 };
+const ATOMIC = {
+  H:1, He:4, Li:7, Be:9, B:11, C:12, N:14, O:16, F:19, Ne:20,
+  Na:23, Mg:24, Al:27, Si:28, P:31, S:32, Cl:35.5, Ar:40,
+  K:39, Ca:40, Sc:45, Ti:48, V:51, Cr:52, Mn:55, Fe:56, Co:59, Ni:59, Cu:64, Zn:65,
+  Ga:70, Ge:73, As:75, Se:79, Br:80, Kr:84,
+  Rb:85, Sr:88, Y:89, Zr:91, Nb:93, Mo:96, Tc:99, Ru:101, Rh:103, Pd:106,
+  Ag:108, Cd:112, In:115, Sn:119, Sb:122, Te:128, I:127, Xe:131,
+  Cs:133, Ba:137, La:139, Ce:140, Pr:141, Nd:144, Pm:145, Sm:150, Eu:152, Gd:157, Tb:159, Dy:163, Ho:165, Er:167, Tm:169, Yb:173, Lu:175,
+  Hf:178, Ta:181, W:184, Re:186, Os:190, Ir:192, Pt:195, Au:197, Hg:201, Tl:204, Pb:207, Bi:209, Po:210, At:210, Rn:222,
+  Fr:223, Ra:226, Ac:227, Th:232, Pa:231, U:238
+};
 function chemMolarMass() {
   const formula = $("chem-formula")?.value.trim();
   if (!formula) return;

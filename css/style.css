@@ -81,6 +81,29 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--p
 .split { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 @media (max-width: 640px) { .split { grid-template-columns: 1fr; } }
 
+/* Calculator keypad grid */
+.calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; max-width: 400px; margin: 0 auto; }
+.calc-grid .calc-key { padding: 14px 8px; font-size: 1.1rem; justify-content: center; background: #f1f5f9; color: var(--text); border-radius: 8px; min-height: 48px; }
+.calc-grid .calc-key:hover { background: #e2e8f0; }
+.calc-grid .calc-op { background: #e0e7ff; color: var(--primary); font-weight: 700; }
+.calc-grid .calc-op:hover { background: #c7d2fe; }
+.calc-grid .calc-eq { grid-column: span 4; padding: 14px; font-size: 1.2rem; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; justify-content: center; display: flex; align-items: center; gap: 6px; }
+.calc-grid .calc-eq:hover { background: var(--primary-hover); }
+
+/* MD1 Logical keyboard */
+.md1-kbd { display: flex; flex-wrap: wrap; gap: 4px; margin: 8px 0; }
+.md1-kbd button { font-size: .9rem; padding: 6px 12px; min-width: 36px; background: #f1f5f9; color: var(--text); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; font-family: monospace; transition: background .1s; }
+.md1-kbd button:hover { background: #e2e8f0; }
+.md1-kbd .kbd-var { background: #e0e7ff; color: var(--primary); font-weight: 700; }
+.md1-kbd .kbd-var:hover { background: #c7d2fe; }
+.md1-kbd .kbd-op { background: #fef3c7; color: #92400e; font-weight: 600; }
+.md1-kbd .kbd-op:hover { background: #fde68a; }
+.md1-kbd .kbd-action { background: var(--primary); color: white; font-weight: 600; }
+.md1-kbd .kbd-action:hover { background: var(--primary-hover); }
+.md1-kbd .kbd-del { background: #fee2e2; color: #dc2626; font-weight: 600; }
+.md1-kbd .kbd-del:hover { background: #fecaca; }
+.md1-kbd .kbd-wide { font-size: .75rem; padding: 6px 10px; min-width: auto; }
+
 /* Password */
 .pw-display {
   display: flex; gap: 8px; align-items: center;

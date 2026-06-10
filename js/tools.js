@@ -2,12 +2,31 @@ const TOOLS = [
   {
     id: "calculator", icon: "🧮", name: "Calculadora", desc: "Suma, resta, multiplica y divide",
     render: () => `
-      <input type="text" id="calc-expr" placeholder="Ej: 2 + 2 * 5" value="2 + 2">
-      <div class="btn-group">
-        <button class="btn" onclick="calcEval()">= Calcular</button>
-        <button class="btn btn-secondary" onclick="document.getElementById('calc-expr').value='2+2';calcEval()">2+2</button>
-        <button class="btn btn-secondary" onclick="document.getElementById('calc-expr').value='15*4+10';calcEval()">15×4+10</button>
-        <button class="btn btn-secondary" onclick="document.getElementById('calc-expr').value='100/3';calcEval()">100÷3</button>
+      <input type="text" id="calc-expr" placeholder="Ej: 2 + 2 * 5" value="2 + 2" onkeydown="if(event.key==='Enter')calcEval()">
+      <div style="margin-top:10px">
+        <div class="calc-grid">
+          <button class="btn calc-key" onclick="calcInsert('(')">(</button>
+          <button class="btn calc-key" onclick="calcInsert(')')">)</button>
+          <button class="btn calc-key calc-op" onclick="calcClear()">C</button>
+          <button class="btn calc-key calc-op" onclick="calcBack()">⌫</button>
+          <button class="btn calc-key" onclick="calcInsert('7')">7</button>
+          <button class="btn calc-key" onclick="calcInsert('8')">8</button>
+          <button class="btn calc-key" onclick="calcInsert('9')">9</button>
+          <button class="btn calc-key calc-op" onclick="calcInsert('/')">÷</button>
+          <button class="btn calc-key" onclick="calcInsert('4')">4</button>
+          <button class="btn calc-key" onclick="calcInsert('5')">5</button>
+          <button class="btn calc-key" onclick="calcInsert('6')">6</button>
+          <button class="btn calc-key calc-op" onclick="calcInsert('*')">×</button>
+          <button class="btn calc-key" onclick="calcInsert('1')">1</button>
+          <button class="btn calc-key" onclick="calcInsert('2')">2</button>
+          <button class="btn calc-key" onclick="calcInsert('3')">3</button>
+          <button class="btn calc-key calc-op" onclick="calcInsert('-')">−</button>
+          <button class="btn calc-key" onclick="calcInsert('0')">0</button>
+          <button class="btn calc-key" onclick="calcInsert('.')">.</button>
+          <button class="btn calc-key calc-op" onclick="calcPi()">π</button>
+          <button class="btn calc-key calc-op" onclick="calcInsert('+')">+</button>
+          <button class="calc-eq" onclick="calcEval()">= Calcular</button>
+        </div>
       </div>
       <div class="result" id="calc-result"></div>
     `,
@@ -304,8 +323,9 @@ const TOOLS = [
       <div class="tabs" style="display:flex;gap:4px;margin-bottom:16px;flex-wrap:wrap">
         <button class="btn btn-secondary" style="flex:1" onclick="md1Tab('truth')">📋 Tabla de Verdad</button>
         <button class="btn btn-secondary" style="flex:1" onclick="md1Tab('eval')">🔢 Evaluar Proposición</button>
-        <button class="btn btn-secondary" style="flex:1" onclick="md1Tab('sets')">📚 Operaciones Conjuntos</button>
-        <button class="btn btn-secondary" style="flex:1" onclick="md1Tab('laws')">📜 Leyes del Álgebra</button>
+        <button class="btn btn-secondary" style="flex:1" onclick="md1Tab('proof')">🔍 Demostración</button>
+        <button class="btn btn-secondary" style="flex:1" onclick="md1Tab('sets')">📚 Conjuntos</button>
+        <button class="btn btn-secondary" style="flex:1" onclick="md1Tab('laws')">📜 Leyes y Reglas</button>
       </div>
       <div id="md1-content"></div>
     `,

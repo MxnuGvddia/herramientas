@@ -7,11 +7,17 @@ function homePage() {
   const layout = getLayout();
   const tools = layout ? layout.map(id => TOOLS.find(t => t.id === id)).filter(Boolean) : TOOLS;
   const isEdit = window._layoutEditing || false;
-  const editBar = isEdit ? `<div style="display:flex;gap:8px;align-items:center;margin-bottom:16px;padding:12px 16px;background:rgba(0,243,255,.04);border:1px solid rgba(0,243,255,.1);border-radius:10px">
+  const editBar = isEdit ? `
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:16px;padding:12px 16px;background:rgba(0,243,255,.04);border:1px solid rgba(0,243,255,.1);border-radius:10px">
       <span style="font-size:.8rem;color:var(--muted)">Arrastra las tarjetas para reordenar</span>
       <button class="btn" onclick="saveLayout()" style="font-size:.8rem;padding:6px 14px;margin-left:auto">💾 Guardar layout</button>
     </div>` : '';
   page.innerHTML = `
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:20px;padding:10px 14px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:10px">
+      <span style="font-size:.8rem;color:var(--muted)">⚙️ Gestionar herramientas</span>
+      <button class="btn btn-secondary" onclick="toggleLayoutEdit()" style="font-size:.8rem;padding:6px 14px">✏️ Editar Layout</button>
+      <button class="btn btn-secondary" onclick="downloadSite()" style="font-size:.8rem;padding:6px 14px">📥 Descargar para offline</button>
+    </div>
     ${editBar}
     <div class="tool-grid ${isEdit ? 'editing' : ''}" id="tool-grid">
       ${tools.map(t => `

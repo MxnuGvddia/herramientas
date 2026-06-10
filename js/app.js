@@ -14,7 +14,7 @@ function homePage() {
       ${isEdit ? '<span style="font-size:.8rem;color:var(--muted)">Arrastra las tarjetas para reordenar</span>' : ''}
       ${isEdit ? '<button class="btn" onclick="saveLayout()" style="font-size:.8rem;padding:6px 14px">💾 Guardar layout</button>' : ''}
     </div>
-    <div class="ad-banner ad-rect"><div class="ad-placeholder">— Publicidad —</div></div>
+    
     <div class="tool-grid ${isEdit ? 'editing' : ''}" id="tool-grid">
       ${tools.map(t => `
         <div class="tool-card" draggable="${isEdit}" data-tool-id="${t.id}"${isEdit ? '' : ` onclick="navigate('${t.id}')"`}>
@@ -25,7 +25,7 @@ function homePage() {
         </div>
       `).join('')}
     </div>
-    <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
+    
   `;
   if (isEdit) {
     const grid = $("tool-grid");
@@ -47,9 +47,9 @@ function toolPage(id) {
       <a class="back" onclick="navigate('')">← Todas las herramientas</a>
       <h1>${t.icon} ${t.name}</h1>
       <p class="desc">${t.desc}</p>
-      <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
+      
       <div class="tool-box" id="tool-content">${t.render()}</div>
-      <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
+      
     </div>
   `;
   if (t.init) setTimeout(t.init, 50);
@@ -373,7 +373,7 @@ function calcTab(tab) {
       <div id="rule3-mode" style="text-align:center;margin-top:8px;font-size:.85rem;color:var(--muted)">Regla de tres <b>directa</b>: X = (B·C)/A</div>
     `,
   };
-  c.innerHTML = (t[tab] || t.basic) + `<div class="ad-banner" style="margin-top:16px"><div class="ad-placeholder">— Publicidad —</div></div>`;
+  c.innerHTML = (t[tab] || t.basic) ;
   if (tab === 'basic') { setTimeout(() => { calcEval(); }, 50); }
   if (tab === 'graph') { setTimeout(() => { graphPlot(); }, 100); }
   if (tab === 'stat') { setTimeout(() => { calcStat(); }, 50); }
@@ -1251,7 +1251,7 @@ function md1EvalPF(postfix, vals) {
 function md1Tab(tab) {
   const c = $("md1-content");
   if (tab === 'truth') c.innerHTML = `
-    <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
+    
     <p style="margin-bottom:8px">Ingresa una expresión lógica usando variables y operadores</p>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <input type="text" id="md1-expr" value="(p∧q)→r" style="flex:1;min-width:180px" placeholder="Ej: ¬p ∨ (q ∧ r)" onkeydown="if(event.key==='Enter')md1Truth()">
@@ -1270,10 +1270,10 @@ function md1Tab(tab) {
       <button class="btn btn-secondary" style="font-size:.75rem;padding:3px 8px" onclick="md1SetExpr('(p⊕q)↔((p∧¬q)∨(¬p∧q))')">(p⊕q)↔((p∧¬q)∨(¬p∧q))</button>
     </div>
     <div id="md1-truth-result" style="margin-top:12px"></div>
-    <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
+    
   `;
   else if (tab === 'eval') c.innerHTML = `
-    <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
+    
     <p style="margin-bottom:8px">Asigna valores de verdad y evalúa una expresión</p>
     <div class="split" style="margin-bottom:8px">
       <div><label>p</label><select id="md1-ep" onchange="md1EvalProp()"><option value="V">V</option><option value="F">F</option></select></div>
@@ -1287,10 +1287,10 @@ function md1Tab(tab) {
     </div>
     ${md1Kbd('md1-ee', {vars:'pqrstu'})}
     <div id="md1-eval-result" style="margin-top:12px"></div>
-    <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
+    
   `;
   else if (tab === 'sets') c.innerHTML = `
-    <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
+    
     <p style="margin-bottom:8px">Operaciones con conjuntos. Ingresa elementos separados por coma.</p>
     <div class="split">
       <div><label>Conjunto A</label><input type="text" id="md1-sa" value="1,2,3,4,5" placeholder="1,2,3,4,5"></div>
@@ -1329,10 +1329,10 @@ function md1Tab(tab) {
       <button class="btn" onclick="md1ShowPartitions()" style="font-size:.8rem">🔍 Generar Particiones</button>
     </div>
     <div id="md1-partition-result"></div>
-    <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
+    
   `;
   else if (tab === 'bool') c.innerHTML = `
-    <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
+    
     <p style="margin-bottom:8px">Álgebra de Boole: evalúa expresiones con variables <b>A, B, C</b> usando + (OR), · (AND), ¬ o ' (NOT)</p>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <input type="text" id="bool-expr" value="A·B + A·C" style="flex:1;min-width:180px" placeholder="Ej: A + B·C" onkeydown="if(event.key==='Enter')boolEval()">
@@ -1368,10 +1368,10 @@ function md1Tab(tab) {
         <tr><td>5. Complemento</td><td>A+¬A = 1 &nbsp; | &nbsp; A·¬A = 0</td></tr>
       </table>
     </div>
-    <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
+    
   `;
   else if (tab === 'gates') c.innerHTML = `
-    <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
+    
     <p style="margin-bottom:8px">Compuertas lógicas básicas y su representación</p>
     <div id="gates-content">
       <div class="split">
@@ -1472,10 +1472,10 @@ function md1Tab(tab) {
         </div>
       </div>
     </div>
-    <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
+    
   `;
   else if (tab === 'intro') c.innerHTML = `
-    <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
+    
     <p style="margin-bottom:12px"><b>Introducción a la Lógica y Matemática Discreta</b></p>
     <div style="font-size:.85rem;line-height:1.8">
       <div class="result-box" style="margin-bottom:12px">
@@ -1532,10 +1532,10 @@ function md1Tab(tab) {
         <div style="display:none;margin-top:6px;padding:8px;background:#f0fdf4;border-radius:6px;font-size:.85rem"><b>Solución:</b> Laura - Verde - Pájaro, Pedro - Rojo - Perro, María - Amarillo - Gato, Juan - Azul - Pez</div>
       </div>
     </div>
-    <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
+    
   `;
   else if (tab === 'proof') c.innerHTML = `
-    <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
+    
     <p style="margin-bottom:8px">Asistente de demostración lógica</p>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <input type="text" id="md1-premises" value="p→q, p" style="flex:1;min-width:180px" placeholder="Premisas separadas por coma">
@@ -1548,10 +1548,10 @@ function md1Tab(tab) {
       <button class="btn btn-secondary" onclick="md1ShowRules()">📜 Reglas Básicas</button>
     </div>
     <div id="md1-proof-result" style="margin-top:12px"></div>
-    <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
+    
   `;
   else if (tab === 'laws') c.innerHTML = `
-    <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
+    
     <div style="font-size:.85rem;line-height:1.8;overflow-x:auto">
       <table class="truth-table">
         <tr><th>Ley</th><th>Forma</th></tr>
@@ -1581,10 +1581,10 @@ function md1Tab(tab) {
         <tr><td>Absorción (Abs)</td><td>p → q &nbsp; ∴ p → (p ∧ q)</td></tr>
       </table>
     </div>
-    <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
+    
   `;
   else if (tab === 'falacias') c.innerHTML = `
-    <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
+    
     <p style="margin-bottom:8px"><b>⚖️ Falacias Lógicas y Argumentos</b></p>
     <div style="font-size:.85rem;line-height:1.7">
       <div class="result-box" style="margin-bottom:10px">
@@ -1628,7 +1628,7 @@ function md1Tab(tab) {
       <button class="btn" onclick="md1DetectFalacia()" style="font-size:.8rem">🔍 Analizar</button>
     </div>
     <div id="md1-falacia-result" class="result-box" style="font-size:.85rem;min-height:20px"></div>
-    <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
+    
   `;
 }
 
@@ -2025,7 +2025,7 @@ function md1StudyTab(tab) {
       </div>
     `
   };
-  c.innerHTML = (t[tab] || t.logic) + `<div class="ad-banner" style="margin-top:16px"><div class="ad-placeholder">— Publicidad —</div></div>`;
+  c.innerHTML = (t[tab] || t.logic) ;
   if (tab === 'logic') setTimeout(md1StudyLogic, 50);
   if (tab === 'sets') setTimeout(md1StudySetsVenn, 50);
   if (tab === 'bool') setTimeout(md1StudyBool, 50);
@@ -2367,7 +2367,7 @@ function precalcTab(tab) {
       <div id="pint-info" class="result-box" style="margin-top:8px;font-size:.85rem;text-align:center"></div>
     `
   };
-  c.innerHTML = (t[tab] || t.func) + `<div class="ad-banner" style="margin-top:16px"><div class="ad-placeholder">— Publicidad —</div></div>`;
+  c.innerHTML = (t[tab] || t.func) ;
   if (tab === 'func') setTimeout(precalcFuncDraw, 50);
   if (tab === 'lim') setTimeout(precalcLimDraw, 50);
   if (tab === 'deriv') setTimeout(precalcDerivDraw, 50);
@@ -2827,8 +2827,7 @@ async function downloadSite() {
     const combined = html
       .replace('<link rel="stylesheet" href="css/style.css">', `<style>${css}</style>`)
       .replace('<script src="js/tools.js"></script>', `<script>${tools}\n</script>`)
-      .replace('<script src="js/app.js"></script>', `<script>${app}\n</script>`)
-      .replace(/<div class="ad-placeholder">— Publicidad —<\/div>/g, '<div class="ad-placeholder" style="background:#f0f0f0;border-radius:8px;padding:12px;text-align:center;color:#999;font-size:.75rem;border:1px dashed #ddd">📦 Sin conexión</div>');
+      .replace('<script src="js/app.js"></script>', `<script>${app}\n</script>`);
     const blob = new Blob([combined], {type: 'text/html'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -2884,103 +2883,106 @@ function makeGraphInteractive(canvasId, vp, redraw) {
   }, { passive: false });
 }
 
-/* ===== HYPERION Background ===== */
-let _bgParticles = [];
-function initBgCanvas() {
+// ============================================================
+// Pastel 3D Background — Three.js
+// ============================================================
+function init3DBg() {
   const canvas = document.getElementById('bg-canvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  let W, H;
+  if (!canvas || typeof THREE === 'undefined') return;
 
-  function resize() {
-    W = canvas.width = window.innerWidth;
-    H = canvas.height = window.innerHeight;
-  }
-  resize();
-  window.addEventListener('resize', resize);
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-  const palette = ['#7c3aed', '#00f3ff', '#ff0055', '#a78bfa', '#06b6d4', '#f472b6'];
-  const count = 90;
-  _bgParticles = [];
-  for (let i = 0; i < count; i++) {
-    _bgParticles.push({
-      x: Math.random() * W,
-      y: Math.random() * H,
-      vx: (Math.random() - 0.5) * 0.3,
-      vy: (Math.random() - 0.5) * 0.3,
-      r: Math.random() * 2.5 + 0.5,
-      color: palette[Math.floor(Math.random() * palette.length)],
-      alpha: Math.random() * 0.35 + 0.08,
-      pulse: Math.random() * Math.PI * 2
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 200);
+  camera.position.z = 35;
+
+  const pastel = [
+    0xFFB5C2, 0xC3B1E1, 0xB5EAD7, 0xFFDAB9, 0xC4E0F9, 0xFFF2B5,
+    0xFBCFE8, 0xDDD6FE, 0xA7F3D0, 0xFED7AA, 0xBFDBFE, 0xFEF08A
+  ];
+
+  const geos = [
+    new THREE.IcosahedronGeometry(1, 0),
+    new THREE.OctahedronGeometry(1, 0),
+    new THREE.DodecahedronGeometry(1, 0),
+    new THREE.TorusKnotGeometry(0.6, 0.3, 48, 6),
+    new THREE.TorusGeometry(0.7, 0.25, 12, 24),
+    new THREE.ConeGeometry(0.8, 1.2, 6)
+  ];
+
+  const objects = [];
+  for (let i = 0; i < 40; i++) {
+    const g = geos[i % geos.length];
+    const c = pastel[i % pastel.length];
+    const mat = new THREE.MeshPhongMaterial({
+      color: c, transparent: true, opacity: 0.55 + Math.random() * 0.35,
+      shininess: 20, flatShading: true
     });
+    const m = new THREE.Mesh(g, mat);
+    const s = 0.25 + Math.random() * 0.6;
+    m.scale.set(s, s, s);
+    m.position.set(
+      (Math.random() - 0.5) * 70,
+      (Math.random() - 0.5) * 50,
+      (Math.random() - 0.5) * 30
+    );
+    m.rotation.set(Math.random() * 6, Math.random() * 6, Math.random() * 6);
+    m.userData = {
+      rx: (Math.random() - 0.5) * 0.008,
+      ry: (Math.random() - 0.5) * 0.008,
+      rz: (Math.random() - 0.5) * 0.004,
+      baseY: m.position.y,
+      phase: Math.random() * Math.PI * 2,
+      speed: 0.003 + Math.random() * 0.004,
+      amp: 0.2 + Math.random() * 0.6
+    };
+    scene.add(m);
+    objects.push(m);
   }
 
-  function drawBackground() {
-    ctx.clearRect(0, 0, W, H);
-    const g = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, Math.max(W, H) * 0.7);
-    g.addColorStop(0, 'rgba(30, 10, 60, 0.4)');
-    g.addColorStop(0.4, 'rgba(10, 5, 30, 0.25)');
-    g.addColorStop(0.7, 'rgba(5, 5, 15, 0.15)');
-    g.addColorStop(1, 'rgba(2, 2, 5, 0)');
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, W, H);
+  const ambient = new THREE.AmbientLight(0xffffff, 0.6);
+  scene.add(ambient);
+  const d1 = new THREE.DirectionalLight(0xfff0f5, 0.9);
+  d1.position.set(15, 20, 25);
+  scene.add(d1);
+  const d2 = new THREE.DirectionalLight(0xf0f0ff, 0.4);
+  d2.position.set(-15, -10, -20);
+  scene.add(d2);
 
-    for (const p of _bgParticles) {
-      p.pulse += 0.02;
-      const sAlpha = p.alpha * (0.6 + 0.4 * Math.sin(p.pulse));
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = p.color;
-      ctx.globalAlpha = sAlpha;
-      ctx.fill();
-      if (p.r > 1.5) {
-        ctx.shadowBlur = 12;
-        ctx.shadowColor = p.color;
-        ctx.fill();
-        ctx.shadowBlur = 0;
-      }
-      ctx.globalAlpha = 1;
+  let mx = 0, my = 0;
+  document.addEventListener('mousemove', e => {
+    mx = (e.clientX / window.innerWidth) * 2 - 1;
+    my = -(e.clientY / window.innerHeight) * 2 + 1;
+  });
+
+  let t = 0;
+  function anim() {
+    requestAnimationFrame(anim);
+    t += 0.01;
+    for (const o of objects) {
+      o.rotation.x += o.userData.rx;
+      o.rotation.y += o.userData.ry;
+      o.rotation.z += o.userData.rz;
+      o.position.y = o.userData.baseY + Math.sin(t * o.userData.speed * 10 + o.userData.phase) * o.userData.amp;
     }
-
-    for (let i = 0; i < _bgParticles.length; i++) {
-      for (let j = i + 1; j < _bgParticles.length; j++) {
-        const dx = _bgParticles[i].x - _bgParticles[j].x;
-        const dy = _bgParticles[i].y - _bgParticles[j].y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 120) {
-          ctx.beginPath();
-          ctx.moveTo(_bgParticles[i].x, _bgParticles[i].y);
-          ctx.lineTo(_bgParticles[j].x, _bgParticles[j].y);
-          ctx.strokeStyle = `rgba(124, 58, 237, ${0.04 * (1 - dist / 120)})`;
-          ctx.lineWidth = 0.5;
-          ctx.stroke();
-        }
-      }
-    }
+    camera.position.x += (mx * 4 - camera.position.x) * 0.015;
+    camera.position.y += (my * 3 - camera.position.y) * 0.015;
+    camera.lookAt(0, 0, 0);
+    renderer.render(scene, camera);
   }
+  anim();
 
-  function update() {
-    for (const p of _bgParticles) {
-      p.x += p.vx;
-      p.y += p.vy;
-      if (p.x < -10) p.x = W + 10;
-      if (p.x > W + 10) p.x = -10;
-      if (p.y < -10) p.y = H + 10;
-      if (p.y > H + 10) p.y = -10;
-    }
-  }
-
-  function loop() {
-    update();
-    drawBackground();
-    requestAnimationFrame(loop);
-  }
-  loop();
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
 }
 
-// Auto-init on load
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initBgCanvas);
+  document.addEventListener('DOMContentLoaded', init3DBg);
 } else {
-  initBgCanvas();
+  init3DBg();
 }

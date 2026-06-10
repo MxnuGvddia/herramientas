@@ -329,6 +329,31 @@ const TOOLS = [
     `,
     init: () => { asciiGen(); }
   },
+  {
+    id: "md1-study", icon: "🧠", name: "MD1 Estudio Interactivo", desc: "Lógica, conjuntos y álgebra booleana con visualizaciones dinámicas",
+    render: () => `
+      <div class="tabs" style="display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap">
+        <button class="btn btn-secondary" style="flex:1;font-size:.75rem;padding:6px" onclick="md1StudyTab('logic')">🧠 Lógica Viva</button>
+        <button class="btn btn-secondary" style="flex:1;font-size:.75rem;padding:6px" onclick="md1StudyTab('sets')">📊 Conjuntos</button>
+        <button class="btn btn-secondary" style="flex:1;font-size:.75rem;padding:6px" onclick="md1StudyTab('bool')">⚡ Álgebra Boole</button>
+      </div>
+      <div id="md1-study-content"></div>
+    `,
+    init: () => { md1StudyTab('logic'); }
+  },
+  {
+    id: "precalc", icon: "📈", name: "Precálculo / Cálculo 1", desc: "Funciones, límites, derivadas e integrales interactivos",
+    render: () => `
+      <div class="tabs" style="display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap">
+        <button class="btn btn-secondary" style="flex:1;font-size:.75rem;padding:6px" onclick="precalcTab('func')">📈 Funciones Vivas</button>
+        <button class="btn btn-secondary" style="flex:1;font-size:.75rem;padding:6px" onclick="precalcTab('lim')">🎯 Límites</button>
+        <button class="btn btn-secondary" style="flex:1;font-size:.75rem;padding:6px" onclick="precalcTab('deriv')">📐 Derivadas</button>
+        <button class="btn btn-secondary" style="flex:1;font-size:.75rem;padding:6px" onclick="precalcTab('int')">∫ Integrales</button>
+      </div>
+      <div id="precalc-content"></div>
+    `,
+    init: () => { precalcTab('func'); }
+  },
 ];
 
 const CONV = {

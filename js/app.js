@@ -1663,3 +1663,693 @@ function md1IndirectProof() {
 function md1ShowRules() {
   md1Tab('laws');
 }
+
+/* ===== MD1 Estudio Interactivo ===== */
+function md1StudyTab(tab) {
+  const c = $("md1-study-content");
+  if (!c) return;
+  const t = {
+    logic: `
+      <p style="font-size:.9rem;margin-bottom:8px"><b>🧠 Lógica Proposicional Interactiva</b></p>
+      <div style="background:var(--bg-card);border-radius:8px;padding:12px;margin-bottom:12px;border:1px solid var(--border)">
+        <p style="font-size:.8rem;margin-bottom:8px">Escribe una expresión lógica con variables <b>p, q, r</b> y operadores <b>¬ ∧ ∨ ⊕ → ↔</b></p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+          <input type="text" id="study-logic-expr" value="p ∧ q → r" style="flex:1;font-family:monospace;font-size:1rem" onkeydown="if(event.key==='Enter')md1StudyLogic()">
+          <button class="btn" onclick="md1StudyLogic()">Generar</button>
+        </div>
+        <div class="md1-kbd" style="font-size:.8rem">
+          <button class="btn btn-secondary" style="padding:4px 8px;font-size:.75rem" onclick="md1SInsert('¬')">¬</button>
+          <button class="btn btn-secondary" style="padding:4px 8px;font-size:.75rem" onclick="md1SInsert('∧')">∧</button>
+          <button class="btn btn-secondary" style="padding:4px 8px;font-size:.75rem" onclick="md1SInsert('∨')">∨</button>
+          <button class="btn btn-secondary" style="padding:4px 8px;font-size:.75rem" onclick="md1SInsert('⊕')">⊕</button>
+          <button class="btn btn-secondary" style="padding:4px 8px;font-size:.75rem" onclick="md1SInsert('→')">→</button>
+          <button class="btn btn-secondary" style="padding:4px 8px;font-size:.75rem" onclick="md1SInsert('↔')">↔</button>
+          <button class="btn btn-secondary" style="padding:4px 8px;font-size:.75rem" onclick="md1SInsert('(')">(</button>
+          <button class="btn btn-secondary" style="padding:4px 8px;font-size:.75rem" onclick="md1SInsert(')')">)</button>
+          <button class="btn btn-secondary" style="padding:4px 8px;font-size:.75rem" onclick="md1SClear()">C</button>
+          <button class="btn btn-secondary" style="padding:4px 8px;font-size:.75rem" onclick="md1SBack()">⌫</button>
+        </div>
+      </div>
+      <div id="study-logic-result"></div>
+      <div style="margin-top:12px">
+        <p style="font-size:.85rem;font-weight:600;margin-bottom:6px">🎯 Ejemplos rápidos:</p>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn btn-secondary" style="padding:4px 12px;font-size:.75rem" onclick="document.getElementById('study-logic-expr').value='p ∧ q';md1StudyLogic()">p ∧ q</button>
+          <button class="btn btn-secondary" style="padding:4px 12px;font-size:.75rem" onclick="document.getElementById('study-logic-expr').value='p ∨ q';md1StudyLogic()">p ∨ q</button>
+          <button class="btn btn-secondary" style="padding:4px 12px;font-size:.75rem" onclick="document.getElementById('study-logic-expr').value='p → q';md1StudyLogic()">p → q</button>
+          <button class="btn btn-secondary" style="padding:4px 12px;font-size:.75rem" onclick="document.getElementById('study-logic-expr').value='p ↔ q';md1StudyLogic()">p ↔ q</button>
+          <button class="btn btn-secondary" style="padding:4px 12px;font-size:.75rem" onclick="document.getElementById('study-logic-expr').value='p ⊕ q';md1StudyLogic()">p ⊕ q</button>
+          <button class="btn btn-secondary" style="padding:4px 12px;font-size:.75rem" onclick="document.getElementById('study-logic-expr').value='¬(p ∧ q) ↔ ¬p ∨ ¬q';md1StudyLogic()">De Morgan</button>
+          <button class="btn btn-secondary" style="padding:4px 12px;font-size:.75rem" onclick="document.getElementById('study-logic-expr').value='(p → q) ∧ (q → r) → (p → r)';md1StudyLogic()">Silogismo</button>
+        </div>
+      </div>
+    `,
+    sets: `
+      <p style="font-size:.9rem;margin-bottom:8px"><b>📊 Diagramas de Venn Interactivos</b></p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;align-items:center">
+        <label style="font-size:.8rem">Elementos de A: <input type="text" id="venn-elems-a" value="1,2,3,4" style="width:120px;padding:4px" oninput="md1StudySetsVenn()"></label>
+        <label style="font-size:.8rem">Elementos de B: <input type="text" id="venn-elems-b" value="3,4,5,6" style="width:120px;padding:4px" oninput="md1StudySetsVenn()"></label>
+      </div>
+      <div class="calc-comp-grid" style="margin-bottom:8px">
+        <button class="btn btn-secondary" onclick="md1StudySetOp('∪')" style="font-size:.8rem">A ∪ B</button>
+        <button class="btn btn-secondary" onclick="md1StudySetOp('∩')" style="font-size:.8rem">A ∩ B</button>
+        <button class="btn btn-secondary" onclick="md1StudySetOp('−')" style="font-size:.8rem">A − B</button>
+        <button class="btn btn-secondary" onclick="md1StudySetOp('Δ')" style="font-size:.8rem">A Δ B</button>
+      </div>
+      <canvas id="venn-canvas" width="480" height="340"></canvas>
+      <div id="venn-result" class="result-box" style="margin-top:8px;font-size:.85rem;text-align:center"></div>
+    `,
+    bool: `
+      <p style="font-size:.9rem;margin-bottom:8px"><b>⚡ Álgebra de Boole Interactiva</b></p>
+      <div style="background:var(--bg-card);border-radius:8px;padding:12px;margin-bottom:12px;border:1px solid var(--border)">
+        <p style="font-size:.8rem;margin-bottom:8px">Variables: <b>A, B, C, D</b> &nbsp; Operadores: <b>·</b> (AND), <b>+</b> (OR), <b>'</b> o <b>¬</b> (NOT)</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <input type="text" id="study-bool-expr" value="A·B + B·C" style="flex:1;font-family:monospace;font-size:1rem" onkeydown="if(event.key==='Enter')md1StudyBool()">
+          <button class="btn" onclick="md1StudyBool()">Evaluar</button>
+        </div>
+        <div style="margin-top:8px;font-size:.75rem" class="md1-kbd">
+          <button class="btn btn-secondary" style="padding:2px 8px" onclick="md1SInsert('A')">A</button>
+          <button class="btn btn-secondary" style="padding:2px 8px" onclick="md1SInsert('B')">B</button>
+          <button class="btn btn-secondary" style="padding:2px 8px" onclick="md1SInsert('C')">C</button>
+          <button class="btn btn-secondary" style="padding:2px 8px" onclick="md1SInsert('D')">D</button>
+          <button class="btn btn-secondary" style="padding:2px 8px" onclick="md1SInsert('·')">·</button>
+          <button class="btn btn-secondary" style="padding:2px 8px" onclick="md1SInsert('+')">+</button>
+          <button class="btn btn-secondary" style="padding:2px 8px" onclick="md1SInsert('¬')">¬</button>
+          <button class="btn btn-secondary" style="padding:2px 8px" onclick="md1SInsert('(')">(</button>
+          <button class="btn btn-secondary" style="padding:2px 8px" onclick="md1SInsert(')')">)</button>
+        </div>
+      </div>
+      <div id="study-bool-result"></div>
+      <div style="margin-top:12px">
+        <p style="font-size:.85rem;font-weight:600;margin-bottom:6px">🎯 Ejemplos:</p>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn btn-secondary" style="padding:4px 12px;font-size:.75rem" onclick="document.getElementById('study-bool-expr').value='A·B';md1StudyBool()">A·B</button>
+          <button class="btn btn-secondary" style="padding:4px 12px;font-size:.75rem" onclick="document.getElementById('study-bool-expr').value='A+B';md1StudyBool()">A+B</button>
+          <button class="btn btn-secondary" style="padding:4px 12px;font-size:.75rem" onclick="document.getElementById('study-bool-expr').value='¬A·B + A·¬B';md1StudyBool()">XOR</button>
+          <button class="btn btn-secondary" style="padding:4px 12px;font-size:.75rem" onclick="document.getElementById('study-bool-expr').value='A·(B+C)';md1StudyBool()">A·(B+C)</button>
+          <button class="btn btn-secondary" style="padding:4px 12px;font-size:.75rem" onclick="document.getElementById('study-bool-expr').value='¬(A·B)';md1StudyBool()">NAND</button>
+          <button class="btn btn-secondary" style="padding:4px 12px;font-size:.75rem" onclick="document.getElementById('study-bool-expr').value='¬A·¬B';md1StudyBool()">NOR</button>
+        </div>
+      </div>
+    `
+  };
+  c.innerHTML = (t[tab] || t.logic) + `<div class="ad-banner" style="margin-top:16px"><div class="ad-placeholder">— Publicidad —</div></div>`;
+  if (tab === 'logic') setTimeout(md1StudyLogic, 50);
+  if (tab === 'sets') setTimeout(md1StudySetsVenn, 50);
+  if (tab === 'bool') setTimeout(md1StudyBool, 50);
+}
+
+let studySetOp = '∪';
+
+function md1SInsert(ch) {
+  const inp = document.getElementById('study-logic-expr') || document.getElementById('study-bool-expr');
+  if (!inp) return;
+  const start = inp.selectionStart, end = inp.selectionEnd;
+  inp.value = inp.value.substring(0, start) + ch + inp.value.substring(end);
+  inp.selectionStart = inp.selectionEnd = start + ch.length;
+  inp.focus();
+}
+function md1SClear() {
+  const inp = document.getElementById('study-logic-expr');
+  if (inp) { inp.value = ""; inp.focus(); }
+}
+function md1SBack() {
+  const inp = document.getElementById('study-logic-expr');
+  if (!inp) return;
+  const start = inp.selectionStart;
+  if (start > 0) {
+    inp.value = inp.value.substring(0, start-1) + inp.value.substring(inp.selectionEnd);
+    inp.selectionStart = inp.selectionEnd = start - 1;
+  }
+  inp.focus();
+}
+
+function md1StudyLogic() {
+  const expr = $("study-logic-expr")?.value.trim();
+  if (!expr) return;
+  const tokens = md1Tokenize(expr);
+  const pf = md1ToPostfix(tokens);
+  const vars = [...new Set(tokens.filter(t => /^[a-z]$/.test(t)))].sort();
+  if (vars.length > 4) { $("study-logic-result").innerHTML = '<div class="result-box error">Máximo 4 variables</div>'; return; }
+  const rows = 2 ** vars.length;
+  let html = '<table class="truth-table"><thead><tr>';
+  for (const v of vars) html += `<th>${v}</th>`;
+  html += `<th style="background:#6366f1;color:#fff">${expr}</th></tr></thead><tbody>`;
+  const colVals = [];
+  for (let i = 0; i < rows; i++) {
+    const vals = {};
+    html += '<tr>';
+    for (let j = 0; j < vars.length; j++) {
+      vals[vars[j]] = !!(i & (1 << (vars.length - 1 - j)));
+      html += `<td>${vals[vars[j]] ? 'V' : 'F'}</td>`;
+    }
+    const r = md1EvalPF(pf, vals);
+    colVals.push(r);
+    html += `<td class="${r ? 'tv' : 'tf'}" style="font-weight:700">${r ? 'V' : 'F'}</td></tr>`;
+  }
+  html += '</tbody></table>';
+  const isTauto = colVals.every(Boolean);
+  const isContra = colVals.every(x => !x);
+  if (isTauto) html += '<div class="result-box" style="margin-top:8px;background:#d1fae5;color:#065f46;font-weight:600">✅ Tautología — siempre verdadero</div>';
+  else if (isContra) html += '<div class="result-box" style="margin-top:8px;background:#fee2e2;color:#991b1b;font-weight:600">❌ Contradicción — siempre falso</div>';
+  else html += '<div class="result-box" style="margin-top:8px;background:#fef3c7;color:#92400e;font-weight:600">⚠️ Contingencia — depende de los valores</div>';
+  const nV = colVals.filter(Boolean).length, nF = colVals.filter(x => !x).length;
+  html += `<div style="font-size:.8rem;color:var(--muted);margin-top:6px;text-align:center">V: ${nV} &nbsp;|&nbsp; F: ${nF} &nbsp;|&nbsp; Filas: ${rows}</div>`;
+  $("study-logic-result").innerHTML = html;
+}
+
+function md1StudySetOp(op) {
+  studySetOp = op;
+  md1StudySetsVenn();
+}
+
+function md1StudySetsVenn() {
+  const canvas = $("venn-canvas");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  const W = canvas.width, H = canvas.height;
+  const cx = W/2, cy = H/2 + 10, r = 110, dx = 60;
+  const aStr = $("venn-elems-a")?.value || "";
+  const bStr = $("venn-elems-b")?.value || "";
+  const setA = new Set(aStr.split(',').map(x => x.trim()).filter(Boolean));
+  const setB = new Set(bStr.split(',').map(x => x.trim()).filter(Boolean));
+  const onlyA = [...setA].filter(x => !setB.has(x));
+  const onlyB = [...setB].filter(x => !setA.has(x));
+  const both = [...setA].filter(x => setB.has(x));
+  ctx.clearRect(0, 0, W, H);
+  ctx.save();
+  if (studySetOp === '∩') {
+    ctx.beginPath(); ctx.arc(cx - dx, cy, r, 0, Math.PI * 2); ctx.clip();
+    ctx.fillStyle = "rgba(139,92,246,0.6)";
+    ctx.beginPath(); ctx.arc(cx + dx, cy, r, 0, Math.PI * 2); ctx.fill();
+  } else if (studySetOp === '∪') {
+    ctx.fillStyle = "rgba(139,92,246,0.3)";
+    ctx.beginPath(); ctx.arc(cx - dx, cy, r, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx + dx, cy, r, 0, Math.PI * 2); ctx.fill();
+  } else if (studySetOp === '−') {
+    ctx.fillStyle = "rgba(59,130,246,0.5)";
+    ctx.beginPath(); ctx.arc(cx - dx, cy, r, 0, Math.PI * 2); ctx.fill();
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath(); ctx.arc(cx + dx, cy, r, 0, Math.PI * 2); ctx.fill();
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = "rgba(59,130,246,0.2)";
+    ctx.beginPath(); ctx.arc(cx - dx, cy, r, 0, Math.PI * 2); ctx.fill();
+  } else if (studySetOp === 'Δ') {
+    ctx.fillStyle = "rgba(139,92,246,0.25)";
+    ctx.beginPath(); ctx.arc(cx - dx, cy, r, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx + dx, cy, r, 0, Math.PI * 2); ctx.fill();
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.fillStyle = "rgba(0,0,0,0.4)";
+    ctx.beginPath(); ctx.arc(cx - dx, cy, r, 0, Math.PI * 2); ctx.clip();
+    ctx.beginPath(); ctx.arc(cx + dx, cy, r, 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.restore();
+  ctx.strokeStyle = "#3b82f6"; ctx.lineWidth = 2.5;
+  ctx.beginPath(); ctx.arc(cx - dx, cy, r, 0, Math.PI * 2); ctx.stroke();
+  ctx.strokeStyle = "#ef4444";
+  ctx.beginPath(); ctx.arc(cx + dx, cy, r, 0, Math.PI * 2); ctx.stroke();
+  ctx.fillStyle = "#1e293b"; ctx.font = "bold 20px sans-serif"; ctx.textAlign = "center";
+  ctx.fillText("A", cx - dx - r/2 - 8, cy + 6);
+  ctx.fillText("B", cx + dx + r/2 + 8, cy + 6);
+  ctx.font = "12px sans-serif"; ctx.fillStyle = "#475569";
+  ctx.fillText(onlyA.join(', '), cx - dx - 5, cy - 5);
+  ctx.fillText(onlyB.join(', '), cx + dx + 5, cy - 5);
+  ctx.fillText(both.join(', '), cx, cy - 10);
+  ctx.font = "13px sans-serif"; ctx.fillStyle = "#6366f1";
+  ctx.fillText(`A ${studySetOp} B`, W/2, 22);
+  let result;
+  if (studySetOp === '∪') result = new Set([...setA, ...setB]);
+  else if (studySetOp === '∩') result = new Set(both);
+  else if (studySetOp === '−') result = new Set(onlyA);
+  else if (studySetOp === 'Δ') result = new Set([...onlyA, ...onlyB]);
+  const arr = [...result].sort();
+  $("venn-result").innerHTML = `
+    <b>A</b> = {${[...setA].join(', ')}} &nbsp;|A|=${setA.size} &nbsp;&nbsp;
+    <b>B</b> = {${[...setB].join(', ')}} &nbsp;|B|=${setB.size}<br>
+    <b>A ${studySetOp} B</b> = {${arr.join(', ')}} &nbsp;|${arr.length}|
+  `;
+}
+
+function md1StudyBool() {
+  const expr = $("study-bool-expr")?.value.trim();
+  if (!expr) return;
+  const tokens = boolTokenize(expr);
+  const pf = md1ToPostfix(tokens);
+  const vars = [...new Set(tokens.filter(t => /^[A-D]$/.test(t)))].sort();
+  if (vars.length > 4) { $("study-bool-result").innerHTML = '<div class="result-box error">Máximo 4 variables (A,B,C,D)</div>'; return; }
+  const rows = 2 ** vars.length;
+  let html = '<table class="truth-table"><thead><tr>';
+  for (const v of vars) html += `<th>${v}</th>`;
+  html += `<th style="background:#6366f1;color:#fff">${expr}</th></tr></thead><tbody>`;
+  const colVals = [];
+  for (let i = 0; i < rows; i++) {
+    const vals = {};
+    html += '<tr>';
+    for (let j = 0; j < vars.length; j++) {
+      vals[vars[j]] = !!(i & (1 << (vars.length - 1 - j)));
+      html += `<td>${vals[vars[j]] ? '1' : '0'}</td>`;
+    }
+    const r = md1EvalPF(pf, vals);
+    colVals.push(r);
+    html += `<td class="${r ? 'tv' : 'tf'}" style="font-weight:700">${r ? '1' : '0'}</td></tr>`;
+  }
+  html += '</tbody></table>';
+  const isTauto = colVals.every(Boolean);
+  const isContra = colVals.every(x => !x);
+  if (isTauto) html += '<div class="result-box" style="margin-top:8px;background:#d1fae5;color:#065f46">✅ Identidad booleana — siempre 1</div>';
+  else if (isContra) html += '<div class="result-box" style="margin-top:8px;background:#fee2e2;color:#991b1b">❌ Siempre 0</div>';
+  html += `<div style="font-size:.8rem;color:var(--muted);margin-top:6px;text-align:center">1: ${colVals.filter(Boolean).length} &nbsp;|&nbsp; 0: ${colVals.filter(x => !x).length} &nbsp;|&nbsp; Filas: ${rows}</div>`;
+  $("study-bool-result").innerHTML = html;
+}
+
+function boolTokenize(s) {
+  const tokens = [];
+  let i = 0;
+  while (i < s.length) {
+    if (' \t'.includes(s[i])) { i++; continue; }
+    if ('()'.includes(s[i])) { tokens.push(s[i]); i++; continue; }
+    if (s[i] === '¬') { tokens.push('¬'); i++; continue; }
+    if (s[i] === '+' || s[i] === '∨') { tokens.push('∨'); i++; continue; }
+    if (s[i] === '·' || s[i] === '*' || s[i] === '∧') { tokens.push('∧'); i++; continue; }
+    if (s[i] === "'") { tokens.push('¬'); i++; continue; }
+    if (/[A-D]/i.test(s[i])) { tokens.push(s[i].toUpperCase()); i++; continue; }
+    i++;
+  }
+  return tokens;
+}
+
+/* ===== Precálculo / Cálculo 1 Interactivo ===== */
+function precalcTab(tab) {
+  const c = $("precalc-content");
+  if (!c) return;
+  const t = {
+    func: `
+      <p style="font-size:.9rem;margin-bottom:8px"><b>📈 Explorador de Funciones</b></p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;align-items:center">
+        <label style="font-size:.8rem">Función:</label>
+        <select id="pfunc-type" onchange="precalcFuncDraw()" style="padding:4px;font-size:.85rem">
+          <option value="linear">Lineal (ax + b)</option>
+          <option value="quad" selected>Cuadrática (ax² + bx + c)</option>
+          <option value="cubic">Cúbica (ax³ + bx² + cx + d)</option>
+          <option value="sin">seno (a·sin(bx + c) + d)</option>
+          <option value="cos">coseno (a·cos(bx + c) + d)</option>
+          <option value="tan">tangente (a·tan(bx))</option>
+          <option value="exp">exponencial (a·e^(bx) + c)</option>
+          <option value="log">logaritmo (a·ln(bx) + c)</option>
+          <option value="sqrt">raíz (a·√(bx) + c)</option>
+          <option value="recip">1/(ax + b)</option>
+        </select>
+      </div>
+      <div id="pfunc-sliders" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;font-size:.75rem"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;font-size:.75rem">
+        <label>X: <input type="number" id="pfunc-xmin" value="-10" style="width:50px;padding:2px" onchange="precalcFuncDraw()">
+        <input type="number" id="pfunc-xmax" value="10" style="width:50px;padding:2px" onchange="precalcFuncDraw()"></label>
+        <label>Y: <input type="number" id="pfunc-ymin" value="-5" style="width:50px;padding:2px" onchange="precalcFuncDraw()">
+        <input type="number" id="pfunc-ymax" value="5" style="width:50px;padding:2px" onchange="precalcFuncDraw()"></label>
+      </div>
+      <canvas id="pfunc-canvas" width="500" height="350"></canvas>
+      <div id="pfunc-info" class="result-box" style="margin-top:8px;font-size:.8rem;text-align:center"></div>
+    `,
+    lim: `
+      <p style="font-size:.9rem;margin-bottom:8px"><b>🎯 Límites — Visualización Interactiva</b></p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;align-items:center">
+        <label style="font-size:.8rem">f(x) = </label>
+        <input type="text" id="plim-fx" value="Math.sin(x)/x" style="flex:1;font-family:monospace;padding:4px" onkeydown="if(event.key==='Enter')precalcLimDraw()">
+        <button class="btn" style="padding:4px 12px;font-size:.8rem" onclick="precalcLimDraw()">Graficar</button>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px;font-size:.8rem;align-items:center">
+        <label>x → <input type="number" id="plim-target" value="0" style="width:60px;padding:4px" oninput="precalcLimDraw()"></label>
+        <label>Zoom: <input type="range" id="plim-zoom" min="1" max="10" step="0.5" value="5" oninput="precalcLimDraw()" style="width:100px"></label>
+        <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="document.getElementById('plim-fx').value='(x*x-1)/(x-1)';precalcLimDraw()">(x²-1)/(x-1)</button>
+        <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="document.getElementById('plim-fx').value='Math.sin(x)/x';precalcLimDraw()">sin(x)/x</button>
+        <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="document.getElementById('plim-fx').value='1/x';precalcLimDraw()">1/x</button>
+      </div>
+      <canvas id="plim-canvas" width="500" height="350"></canvas>
+      <div id="plim-info" class="result-box" style="margin-top:8px;font-size:.85rem;text-align:center"></div>
+    `,
+    deriv: `
+      <p style="font-size:.9rem;margin-bottom:8px"><b>📐 Derivadas — Recta Tangente</b></p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;align-items:center">
+        <label style="font-size:.8rem">f(x) = </label>
+        <input type="text" id="pderiv-fx" value="x*x" style="flex:1;font-family:monospace;padding:4px" onkeydown="if(event.key==='Enter')precalcDerivDraw()">
+        <button class="btn" style="padding:4px 12px;font-size:.8rem" onclick="precalcDerivDraw()">Graficar</button>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px;font-size:.8rem;align-items:center">
+        <label>x₀ = <input type="range" id="pderiv-x" min="-8" max="8" step="0.1" value="1" oninput="precalcDerivDraw()" style="width:150px">
+        <span id="pderiv-xval" style="font-weight:600;min-width:30px">1</span></label>
+        <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="document.getElementById('pderiv-fx').value='x*x';precalcDerivDraw()">x²</button>
+        <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="document.getElementById('pderiv-fx').value='Math.sin(x)';precalcDerivDraw()">sin(x)</button>
+        <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="document.getElementById('pderiv-fx').value='x*x*x';precalcDerivDraw()">x³</button>
+        <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="document.getElementById('pderiv-fx').value='Math.exp(x)';precalcDerivDraw()">eˣ</button>
+      </div>
+      <canvas id="pderiv-canvas" width="500" height="350"></canvas>
+      <div id="pderiv-info" class="result-box" style="margin-top:8px;font-size:.85rem;text-align:center"></div>
+    `,
+    int: `
+      <p style="font-size:.9rem;margin-bottom:8px"><b>∫ Integral Definida — Sumas de Riemann</b></p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;align-items:center">
+        <label style="font-size:.8rem">f(x) = </label>
+        <input type="text" id="pint-fx" value="x*x" style="flex:1;font-family:monospace;padding:4px" onkeydown="if(event.key==='Enter')precalcIntDraw()">
+        <button class="btn" style="padding:4px 12px;font-size:.8rem" onclick="precalcIntDraw()">Graficar</button>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px;font-size:.8rem;align-items:center">
+        <label>a = <input type="number" id="pint-a" value="0" style="width:50px;padding:4px" oninput="precalcIntDraw()"></label>
+        <label>b = <input type="number" id="pint-b" value="2" style="width:50px;padding:4px" oninput="precalcIntDraw()"></label>
+        <label>Rectángulos: <input type="range" id="pint-n" min="2" max="50" step="1" value="8" oninput="precalcIntDraw()" style="width:120px">
+        <span id="pint-nval" style="font-weight:600;min-width:20px">8</span></label>
+        <select id="pint-type" onchange="precalcIntDraw()" style="padding:4px;font-size:.75rem">
+          <option value="left">Izquierda</option>
+          <option value="mid" selected>Punto medio</option>
+          <option value="right">Derecha</option>
+        </select>
+      </div>
+      <canvas id="pint-canvas" width="500" height="350"></canvas>
+      <div id="pint-info" class="result-box" style="margin-top:8px;font-size:.85rem;text-align:center"></div>
+    `
+  };
+  c.innerHTML = (t[tab] || t.func) + `<div class="ad-banner" style="margin-top:16px"><div class="ad-placeholder">— Publicidad —</div></div>`;
+  if (tab === 'func') setTimeout(precalcFuncDraw, 50);
+  if (tab === 'lim') setTimeout(precalcLimDraw, 50);
+  if (tab === 'deriv') setTimeout(precalcDerivDraw, 50);
+  if (tab === 'int') setTimeout(precalcIntDraw, 50);
+}
+
+function precalcFuncDraw() {
+  const canvas = $("pfunc-canvas");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  const W = canvas.width, H = canvas.height;
+  const type = $("pfunc-type")?.value || "quad";
+  const xmin = parseFloat($("pfunc-xmin")?.value || -10), xmax = parseFloat($("pfunc-xmax")?.value || 10);
+  const ymin = parseFloat($("pfunc-ymin")?.value || -5), ymax = parseFloat($("pfunc-ymax")?.value || 5);
+  const slidersDiv = $("pfunc-sliders");
+  const paramDefs = {
+    linear: [{id:'pa',label:'a (pendiente)',min:-5,max:5,step:0.1,val:1},{id:'pb',label:'b (intercepto)',min:-10,max:10,step:0.5,val:0}],
+    quad: [{id:'pa',label:'a',min:-5,max:5,step:0.1,val:1},{id:'pb',label:'b',min:-10,max:10,step:0.5,val:0},{id:'pc',label:'c',min:-10,max:10,step:0.5,val:0}],
+    cubic: [{id:'pa',label:'a',min:-3,max:3,step:0.1,val:1},{id:'pb',label:'b',min:-5,max:5,step:0.2,val:0},{id:'pc',label:'c',min:-5,max:5,step:0.2,val:0},{id:'pd',label:'d',min:-5,max:5,step:0.5,val:0}],
+    sin: [{id:'pa',label:'amplitud',min:0.1,max:5,step:0.1,val:1},{id:'pb',label:'frecuencia',min:0.1,max:5,step:0.1,val:1},{id:'pc',label:'fase',min:-6.28,max:6.28,step:0.1,val:0},{id:'pd',label:'desplaz. Y',min:-5,max:5,step:0.5,val:0}],
+    cos: [{id:'pa',label:'amplitud',min:0.1,max:5,step:0.1,val:1},{id:'pb',label:'frecuencia',min:0.1,max:5,step:0.1,val:1},{id:'pc',label:'fase',min:-6.28,max:6.28,step:0.1,val:0},{id:'pd',label:'desplaz. Y',min:-5,max:5,step:0.5,val:0}],
+    tan: [{id:'pa',label:'amplitud',min:0.1,max:5,step:0.1,val:1},{id:'pb',label:'frecuencia',min:0.1,max:2,step:0.1,val:1}],
+    exp: [{id:'pa',label:'a',min:0.1,max:5,step:0.1,val:1},{id:'pb',label:'b (tasa)',min:-2,max:2,step:0.1,val:0.5},{id:'pc',label:'c',min:-10,max:10,step:0.5,val:0}],
+    log: [{id:'pa',label:'a',min:0.1,max:5,step:0.1,val:1},{id:'pb',label:'b',min:0.1,max:5,step:0.1,val:1},{id:'pc',label:'c',min:-5,max:5,step:0.5,val:0}],
+    sqrt: [{id:'pa',label:'a',min:-3,max:3,step:0.1,val:1},{id:'pb',label:'b',min:0.1,max:3,step:0.1,val:1},{id:'pc',label:'c',min:-5,max:5,step:0.5,val:0}],
+    recip: [{id:'pa',label:'a',min:-5,max:5,step:0.1,val:1},{id:'pb',label:'b',min:-10,max:10,step:0.5,val:0}],
+  };
+  const params = paramDefs[type] || paramDefs.quad;
+  let sliderHtml = '';
+  for (const p of params) {
+    const el = $(p.id);
+    const currentVal = el ? parseFloat(el.value) : p.val;
+    sliderHtml += `<label style="display:flex;align-items:center;gap:4px;white-space:nowrap">${p.label}:
+      <input type="range" id="${p.id}" min="${p.min}" max="${p.max}" step="${p.step}" value="${currentVal}" oninput="precalcFuncDraw()" style="width:80px">
+      <span id="${p.id}-v" style="min-width:28px;font-weight:600">${currentVal}</span></label>`;
+  }
+  slidersDiv.innerHTML = sliderHtml;
+  const a = parseFloat($("pa")?.value || 1), b = parseFloat($("pb")?.value || 0);
+  const c = parseFloat($("pc")?.value || 0), d = parseFloat($("pd")?.value || 0);
+  for (const p of params) {
+    const vEl = $(p.id + '-v');
+    if (vEl) vEl.textContent = parseFloat($(p.id)?.value || p.val).toFixed(p.step < 0.5 ? 2 : 1);
+  }
+  let fx;
+  switch(type) {
+    case 'linear': fx = `(${a})*x+(${b})`; break;
+    case 'quad': fx = `(${a})*x*x+(${b})*x+(${c})`; break;
+    case 'cubic': fx = `(${a})*x*x*x+(${b})*x*x+(${c})*x+(${d})`; break;
+    case 'sin': fx = `(${a})*Math.sin((${b})*x+(${c}))+(${d})`; break;
+    case 'cos': fx = `(${a})*Math.cos((${b})*x+(${c}))+(${d})`; break;
+    case 'tan': fx = `(${a})*Math.tan((${b})*x)`; break;
+    case 'exp': fx = `(${a})*Math.exp((${b})*x)+(${c})`; break;
+    case 'log': fx = `(${a})*Math.log((${b})*x)+(${c})`; break;
+    case 'sqrt': fx = `(${a})*Math.sqrt((${b})*x)+(${c})`; break;
+    case 'recip': fx = `1/((${a})*x+(${b}))`; break;
+  }
+  ctx.clearRect(0, 0, W, H);
+  const px = x => (x - xmin) / (xmax - xmin) * W;
+  const py = y => H - (y - ymin) / (ymax - ymin) * H;
+  ctx.strokeStyle = "#e2e8f0"; ctx.lineWidth = 0.5;
+  for (let i = Math.ceil(xmin); i <= Math.floor(xmax); i++) {
+    if (i === 0) continue;
+    ctx.beginPath(); ctx.moveTo(px(i), 0); ctx.lineTo(px(i), H); ctx.stroke();
+  }
+  for (let i = Math.ceil(ymin); i <= Math.floor(ymax); i++) {
+    if (i === 0) continue;
+    ctx.beginPath(); ctx.moveTo(0, py(i)); ctx.lineTo(W, py(i)); ctx.stroke();
+  }
+  ctx.strokeStyle = "#94a3b8"; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(px(0), 0); ctx.lineTo(px(0), H); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0, py(0)); ctx.lineTo(W, py(0)); ctx.stroke();
+  const steps = W;
+  ctx.strokeStyle = "#6366f1"; ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  let started = false;
+  let roots = [];
+  for (let i = 0; i <= steps; i++) {
+    const x = xmin + (xmax - xmin) * i / steps;
+    try {
+      const y = Function("x", `return (${fx})`)(x);
+      if (typeof y !== 'number' || !isFinite(y) || y < ymin || y > ymax) { started = false; continue; }
+      if (!started) { ctx.moveTo(px(x), py(y)); started = true; } else ctx.lineTo(px(x), py(y));
+      if (i > 0 && Math.abs(y) < 0.01) roots.push(x);
+    } catch(e) { started = false; }
+  }
+  ctx.stroke();
+  ctx.fillStyle = "#1a1a2e"; ctx.font = "12px monospace"; ctx.textAlign = "left";
+  const funcNames = { linear: 'Lineal', quad: 'Cuadrática', cubic: 'Cúbica', sin: 'Seno', cos: 'Coseno', tan: 'Tangente', exp: 'Exponencial', log: 'Logarítmica', sqrt: 'Raíz', recip: '1/(ax+b)' };
+  ctx.fillText(`${funcNames[type]}: f(x) = ${fx}`, 10, 16);
+  const infoEl = $("pfunc-info");
+  if (infoEl) {
+    let info = `<b>${funcNames[type]}</b> &nbsp; f(x) = ${fx}`;
+    if (type === 'quad' && a !== 0) {
+      const vertexX = -b / (2*a);
+      const vertexY = Function("x", `return (${fx})`)(vertexX);
+      info += ` &nbsp; | &nbsp; Vértice: (${vertexX.toFixed(2)}, ${vertexY.toFixed(2)})`;
+      info += ` &nbsp; | &nbsp; ${a > 0 ? 'Abre hacia arriba (∪)' : 'Abre hacia abajo (∩)'}`;
+    }
+    infoEl.innerHTML = info;
+  }
+}
+
+function precalcLimDraw() {
+  const canvas = $("plim-canvas");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  const W = canvas.width, H = canvas.height;
+  const fx = $("plim-fx")?.value.trim() || "Math.sin(x)/x";
+  const target = parseFloat($("plim-target")?.value || 0);
+  const zoom = parseFloat($("plim-zoom")?.value || 5);
+  const range = zoom;
+  const xmin = target - range, xmax = target + range;
+  const ymin = -range * 0.7, ymax = range * 0.7;
+  ctx.clearRect(0, 0, W, H);
+  const px = x => (x - xmin) / (xmax - xmin) * W;
+  const py = y => H - (y - ymin) / (ymax - ymin) * H;
+  ctx.strokeStyle = "#e2e8f0"; ctx.lineWidth = 0.5;
+  for (let i = -20; i <= 20; i++) { if (i === 0) continue;
+    ctx.beginPath(); ctx.moveTo(px(target + i*range/5), 0); ctx.lineTo(px(target + i*range/5), H); ctx.stroke(); }
+  for (let i = -20; i <= 20; i++) { if (i === 0) continue;
+    ctx.beginPath(); ctx.moveTo(0, py(i*range/5*0.7)); ctx.lineTo(W, py(i*range/5*0.7)); ctx.stroke(); }
+  ctx.strokeStyle = "#94a3b8"; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(px(target), 0); ctx.lineTo(px(target), H); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0, py(0)); ctx.lineTo(W, py(0)); ctx.stroke();
+  const steps = W;
+  ctx.strokeStyle = "#6366f1"; ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  let started = false;
+  for (let i = 0; i <= steps; i++) {
+    const x = xmin + (xmax - xmin) * i / steps;
+    try {
+      const y = Function("x", `return (${fx})`)(x);
+      if (typeof y !== 'number' || !isFinite(y) || y < ymin || y > ymax) { started = false; continue; }
+      if (!started) { ctx.moveTo(px(x), py(y)); started = true; } else ctx.lineTo(px(x), py(y));
+    } catch(e) { started = false; }
+  }
+  ctx.stroke();
+  const h = 1e-8;
+  let limLeft, limRight;
+  try {
+    const f = v => Function("x", `return (${fx})`)(v);
+    limLeft = f(target - h);
+    limRight = f(target + h);
+  } catch(e) { limLeft = limRight = NaN; }
+  if (isFinite(limLeft)) {
+    ctx.fillStyle = "#ef4444"; ctx.beginPath(); ctx.arc(px(target - h), py(limLeft), 5, 0, Math.PI*2); ctx.fill();
+  }
+  if (isFinite(limRight)) {
+    ctx.fillStyle = "#22c55e"; ctx.beginPath(); ctx.arc(px(target + h), py(limRight), 5, 0, Math.PI*2); ctx.fill();
+  }
+  ctx.fillStyle = "#6366f1";
+  ctx.beginPath(); ctx.arc(px(target), py(target > xmin && target < xmax ? Function("x", `return (${fx})`)(target) : 0), 6, 0, Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle = "#1a1a2e"; ctx.font = "12px monospace"; ctx.textAlign = "left";
+  ctx.fillText(`f(x) = ${fx}`, 10, 16);
+  ctx.fillStyle = "#ef4444"; ctx.textAlign = "right";
+  ctx.fillText(`→ Izq: ${isFinite(limLeft) ? limLeft.toFixed(4) : '∞'}`, W - 10, 16);
+  ctx.fillStyle = "#22c55e";
+  ctx.fillText(`→ Der: ${isFinite(limRight) ? limRight.toFixed(4) : '∞'}`, W - 10, 34);
+  const infoEl = $("plim-info");
+  if (infoEl) {
+    let info = `lim<sub>x→${target}</sub> ${fx}`;
+    if (isFinite(limLeft) && isFinite(limRight) && Math.abs(limLeft - limRight) < 1e-6) {
+      info += ` = <b style="color:#059669">${limLeft.toFixed(6)}</b>`;
+    } else if (isFinite(limLeft) && isFinite(limRight)) {
+      info += ` &nbsp; Izquierda: ${limLeft.toFixed(4)} &nbsp; Derecha: ${limRight.toFixed(4)} &nbsp; <b style="color:#dc2626">No existe</b>`;
+    } else {
+      info += ` &nbsp; <b style="color:#dc2626">No existe / ∞</b>`;
+    }
+    infoEl.innerHTML = info;
+  }
+}
+
+function precalcDerivDraw() {
+  const canvas = $("pderiv-canvas");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  const W = canvas.width, H = canvas.height;
+  const fx = $("pderiv-fx")?.value.trim() || "x*x";
+  const x0 = parseFloat($("pderiv-x")?.value || 1);
+  const xmin = -10, xmax = 10, ymin = -5, ymax = 5;
+  $("pderiv-xval").textContent = x0.toFixed(1);
+  ctx.clearRect(0, 0, W, H);
+  const px = x => (x - xmin) / (xmax - xmin) * W;
+  const py = y => H - (y - ymin) / (ymax - ymin) * H;
+  ctx.strokeStyle = "#e2e8f0"; ctx.lineWidth = 0.5;
+  for (let i = Math.ceil(xmin); i <= Math.floor(xmax); i++) { if (i === 0) continue;
+    ctx.beginPath(); ctx.moveTo(px(i), 0); ctx.lineTo(px(i), H); ctx.stroke(); }
+  for (let i = Math.ceil(ymin); i <= Math.floor(ymax); i++) { if (i === 0) continue;
+    ctx.beginPath(); ctx.moveTo(0, py(i)); ctx.lineTo(W, py(i)); ctx.stroke(); }
+  ctx.strokeStyle = "#94a3b8"; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(px(0), 0); ctx.lineTo(px(0), H); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0, py(0)); ctx.lineTo(W, py(0)); ctx.stroke();
+  const steps = W;
+  ctx.strokeStyle = "#6366f1"; ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  let started = false;
+  for (let i = 0; i <= steps; i++) {
+    const x = xmin + (xmax - xmin) * i / steps;
+    try {
+      const y = Function("x", `return (${fx})`)(x);
+      if (typeof y !== 'number' || !isFinite(y) || y < ymin || y > ymax) { started = false; continue; }
+      if (!started) { ctx.moveTo(px(x), py(y)); started = true; } else ctx.lineTo(px(x), py(y));
+    } catch(e) { started = false; }
+  }
+  ctx.stroke();
+  let deriv, y0;
+  try {
+    const f = v => Function("x", `return (${fx})`)(v);
+    const h = 1e-8;
+    deriv = (f(x0 + h) - f(x0 - h)) / (2 * h);
+    y0 = f(x0);
+  } catch(e) { deriv = NaN; y0 = NaN; }
+  if (isFinite(deriv) && isFinite(y0)) {
+    const x1 = x0 - 3, y1 = y0 + deriv * (x1 - x0);
+    const x2 = x0 + 3, y2 = y0 + deriv * (x2 - x0);
+    ctx.strokeStyle = "#ef4444"; ctx.lineWidth = 2;
+    ctx.setLineDash([6, 4]);
+    ctx.beginPath();
+    if (y1 >= ymin && y1 <= ymax) { ctx.moveTo(px(x1), py(y1)); } else { const t = (ymin - y0) / deriv; ctx.moveTo(px(x0 + t), py(ymin)); }
+    if (y2 >= ymin && y2 <= ymax) { ctx.lineTo(px(x2), py(y2)); } else { const t = (ymax - y0) / deriv; ctx.lineTo(px(x0 + t), py(ymax)); }
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = "#ef4444";
+    ctx.beginPath(); ctx.arc(px(x0), py(y0), 7, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = "#fff"; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(px(x0), py(y0), 7, 0, Math.PI*2); ctx.stroke();
+  }
+  ctx.fillStyle = "#1a1a2e"; ctx.font = "12px monospace"; ctx.textAlign = "left";
+  ctx.fillText(`f(x) = ${fx}`, 10, 16);
+  ctx.fillStyle = "#ef4444";
+  ctx.fillText(`Recta tangente en x = ${x0.toFixed(1)}`, 10, 34);
+  const infoEl = $("pderiv-info");
+  if (infoEl) {
+    if (isFinite(deriv)) {
+      infoEl.innerHTML = `
+        f(${x0.toFixed(2)}) = <b>${isFinite(y0) ? y0.toFixed(4) : '?'}</b> &nbsp;|&nbsp;
+        f'(${x0.toFixed(2)}) = <b style="color:#dc2626">${deriv.toFixed(6)}</b><br>
+        <span style="font-size:.75rem;color:var(--muted)">Ecuación tangente: y - ${y0.toFixed(2)} = ${deriv.toFixed(4)}(x - ${x0.toFixed(2)})</span>
+      `;
+    } else {
+      infoEl.innerHTML = '<span style="color:#dc2626">La función no es derivable en este punto</span>';
+    }
+  }
+}
+
+function precalcIntDraw() {
+  const canvas = $("pint-canvas");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  const W = canvas.width, H = canvas.height;
+  const fx = $("pint-fx")?.value.trim() || "x*x";
+  const a = parseFloat($("pint-a")?.value || 0);
+  const b = parseFloat($("pint-b")?.value || 2);
+  const n = parseInt($("pint-n")?.value || 8);
+  const rtype = $("pint-type")?.value || "mid";
+  $("pint-nval").textContent = n;
+  const pad = 0.2;
+  const xmin = a - (b - a) * pad, xmax = b + (b - a) * pad;
+  const margin = 0.3;
+  let maxY = 0;
+  for (let i = 0; i <= 100; i++) {
+    const x = a + (b - a) * i / 100;
+    try { const y = Math.abs(Function("x", `return (${fx})`)(x)); if (isFinite(y) && y > maxY) maxY = y; } catch(e) {}
+  }
+  const ymin = -maxY * margin, ymax = maxY * (1 + margin);
+  ctx.clearRect(0, 0, W, H);
+  const px = x => (x - xmin) / (xmax - xmin) * W;
+  const py = y => H - (y - ymin) / (ymax - ymin) * H;
+  ctx.strokeStyle = "#e2e8f0"; ctx.lineWidth = 0.5;
+  for (let i = Math.ceil(xmin); i <= Math.floor(xmax); i++) { if (i === 0) continue;
+    ctx.beginPath(); ctx.moveTo(px(i), 0); ctx.lineTo(px(i), H); ctx.stroke(); }
+  for (let i = Math.ceil(ymin); i <= Math.floor(ymax); i++) { if (i === 0) continue;
+    ctx.beginPath(); ctx.moveTo(0, py(i)); ctx.lineTo(W, py(i)); ctx.stroke(); }
+  ctx.strokeStyle = "#94a3b8"; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(px(0), 0); ctx.lineTo(px(0), H); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0, py(0)); ctx.lineTo(W, py(0)); ctx.stroke();
+  const h = (b - a) / n;
+  let sum = 0;
+  for (let i = 0; i < n; i++) {
+    let xSample;
+    if (rtype === 'left') xSample = a + i * h;
+    else if (rtype === 'right') xSample = a + (i + 1) * h;
+    else xSample = a + (i + 0.5) * h;
+    let ySample;
+    try { ySample = Function("x", `return (${fx})`)(xSample); } catch(e) { ySample = 0; }
+    if (!isFinite(ySample)) ySample = 0;
+    sum += ySample * h;
+    const x = a + i * h;
+    ctx.fillStyle = ySample >= 0 ? "rgba(99,102,241,0.25)" : "rgba(239,68,68,0.25)";
+    ctx.strokeStyle = ySample >= 0 ? "rgba(99,102,241,0.6)" : "rgba(239,68,68,0.6)";
+    ctx.lineWidth = 1;
+    ctx.fillRect(px(x), py(Math.max(0, ySample)), px(x + h) - px(x), py(Math.min(0, ySample)) - py(Math.max(0, ySample)));
+    ctx.strokeRect(px(x), py(Math.max(0, ySample)), px(x + h) - px(x), py(Math.min(0, ySample)) - py(Math.max(0, ySample)));
+  }
+  const steps = W;
+  ctx.strokeStyle = "#6366f1"; ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  let started = false;
+  for (let i = 0; i <= steps; i++) {
+    const x = xmin + (xmax - xmin) * i / steps;
+    try {
+      const y = Function("x", `return (${fx})`)(x);
+      if (typeof y !== 'number' || !isFinite(y) || y < ymin || y > ymax) { started = false; continue; }
+      if (!started) { ctx.moveTo(px(x), py(y)); started = true; } else ctx.lineTo(px(x), py(y));
+    } catch(e) { started = false; }
+  }
+  ctx.stroke();
+  ctx.strokeStyle = "#059669"; ctx.lineWidth = 2;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath(); ctx.moveTo(px(a), 0); ctx.lineTo(px(a), H); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(px(b), 0); ctx.lineTo(px(b), H); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = "#1a1a2e"; ctx.font = "12px monospace"; ctx.textAlign = "left";
+  ctx.fillText(`f(x) = ${fx}`, 10, 16);
+  ctx.fillStyle = "#059669";
+  ctx.fillText(`a = ${a.toFixed(1)} &nbsp; b = ${b.toFixed(1)}`, 10, 34);
+  const infoEl = $("pint-info");
+  if (infoEl) {
+    infoEl.innerHTML = `
+      ∫<sub>${a}</sub><sup>${b}</sup> ${fx} dx &nbsp;≈&nbsp; <b style="color:#6366f1;font-size:1.1rem">${sum.toFixed(6)}</b>
+      &nbsp; (${rtype === 'left' ? 'izquierda' : rtype === 'right' ? 'derecha' : 'punto medio'}, n=${n})
+    `;
+  }
+}

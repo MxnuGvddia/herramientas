@@ -13,11 +13,6 @@ function homePage() {
       <button class="btn" onclick="saveLayout()" style="font-size:.8rem;padding:6px 14px;margin-left:auto">💾 Guardar layout</button>
     </div>` : '';
   page.innerHTML = `
-    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:20px;padding:10px 14px;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:10px">
-      <span style="font-size:.8rem;color:var(--muted)">⚙️ Gestionar herramientas</span>
-      <button class="btn btn-secondary" onclick="toggleLayoutEdit()" style="font-size:.8rem;padding:6px 14px">✏️ Editar Layout</button>
-      <button class="btn btn-secondary" onclick="downloadSite()" style="font-size:.8rem;padding:6px 14px">📥 Descargar para offline</button>
-    </div>
     ${editBar}
     <div class="tool-grid ${isEdit ? 'editing' : ''}" id="tool-grid">
       ${tools.map(t => `

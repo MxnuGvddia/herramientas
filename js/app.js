@@ -3272,7 +3272,8 @@ function _bgInit3D() {
       baseX: m.position.x, baseY: m.position.y, baseZ: m.position.z,
       phaseX: Math.random() * Math.PI * 2, phaseY: Math.random() * Math.PI * 2, phaseZ: Math.random() * Math.PI * 2,
       speedX: 0.003 + Math.random() * 0.005, speedY: 0.003 + Math.random() * 0.005, speedZ: 0.002 + Math.random() * 0.004,
-      ampX: 0.3 + Math.random() * 0.8, ampY: 0.3 + Math.random() * 0.8, ampZ: 0.2 + Math.random() * 0.5
+      ampX: 0.3 + Math.random() * 0.8, ampY: 0.3 + Math.random() * 0.8, ampZ: 0.2 + Math.random() * 0.5,
+      driftX: 0, driftY: 0, driftZ: 0
     };
     scene.add(m);
     objects.push(m);
@@ -3296,15 +3297,21 @@ function _bgInit3D() {
     time += 0.01;
     autoAngle += 0.0004;
     const breath = _bgCfg.preset === 'breathing' ? 0.4 + 0.6 * Math.sin(time * 0.8) : 1;
-    const wave = Math.sin(time * 0.3) * 0.2;
     for (const o of objects) {
-      o.rotation.x += o.userData.rx + wave * 0.002;
-      o.rotation.y += o.userData.ry;
-      o.rotation.z += o.userData.rz + Math.sin(time * 0.1 + o.userData.phaseZ) * 0.001;
-      o.position.x = o.userData.baseX + Math.sin(time * o.userData.speedX * 8 + o.userData.phaseX) * o.userData.ampX * breath;
-      o.position.y = o.userData.baseY + Math.sin(time * o.userData.speedY * 8 + o.userData.phaseY + 1) * o.userData.ampY * breath;
-      o.position.z = o.userData.baseZ + Math.sin(time * o.userData.speedZ * 6 + o.userData.phaseZ + 2) * o.userData.ampZ * breath * 0.6;
-      o.material.opacity = (0.5 + 0.3 * Math.sin(time * 0.5 + o.userData.phaseY)) * breath;
+      const noise = o.userData;
+      noise.driftX += (Math.random() - 0.5) * 0.0004;
+      noise.driftY += (Math.random() - 0.5) * 0.0004;
+      noise.driftZ += (Math.random() - 0.5) * 0.0003;
+      noise.driftX = Math.max(-0.02, Math.min(0.02, noise.driftX));
+      noise.driftY = Math.max(-0.02, Math.min(0.02, noise.driftY));
+      noise.driftZ = Math.max(-0.015, Math.min(0.015, noise.driftZ));
+      o.rotation.x += noise.rx + noise.driftX + Math.sin(time * 0.2 + noise.phaseX) * 0.004;
+      o.rotation.y += noise.ry + noise.driftY + Math.cos(time * 0.15 + noise.phaseY) * 0.004;
+      o.rotation.z += noise.rz + noise.driftZ + Math.sin(time * 0.25 + noise.phaseZ) * 0.003;
+      o.position.x = noise.baseX + Math.sin(time * noise.speedX * 8 + noise.phaseX) * noise.ampX * breath;
+      o.position.y = noise.baseY + Math.sin(time * noise.speedY * 8 + noise.phaseY + 1) * noise.ampY * breath;
+      o.position.z = noise.baseZ + Math.sin(time * noise.speedZ * 6 + noise.phaseZ + 2) * noise.ampZ * breath * 0.6;
+      o.material.opacity = (0.5 + 0.3 * Math.sin(time * 0.5 + noise.phaseY)) * breath;
     }
     camera.position.x += (mx * 5 + Math.sin(autoAngle) * 2 - camera.position.x) * 0.015;
     camera.position.y += (my * 4 + Math.cos(autoAngle * 0.7) * 1.5 - camera.position.y) * 0.015;

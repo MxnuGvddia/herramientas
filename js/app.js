@@ -2879,38 +2879,65 @@ function makeGraphInteractive(canvasId, vp, redraw) {
   }, { passive: false });
 }
 
-/* ===== HYPERION Background ===== */
+/* ===== Dynamic Background Engine ===== */
 let _bgParticles = [];
-function initBgCanvas() {
+let _bg3D = null;
+let _bgRAF = null;
+let _bgTime = 0;
+
+const _bgPresets = {
+  hyperion: ['#7c3aed','#00f3ff','#ff0055','#a78bfa','#06b6d4','#f472b6'],
+  rainbow:  ['#ff0040','#ff8c00','#ffe600','#00e676','#2979ff','#d500f9'],
+  aurora:   ['#00e676','#1de9b6','#00bcd4','#7c4dff','#e040fb','#00e5ff'],
+  fire:     ['#ff1744','#ff6d00','#ff9100','#ffab00','#d50000','#ff3d00'],
+  ocean:    ['#0277bd','#0288d1','#039be5','#03a9f4','#29b6f6','#4fc3f7'],
+  breathing:['#7c3aed']
+};
+
+function _loadBgSettings() {
+  try { return JSON.parse(localStorage.getItem('bg-settings')); } catch(e) {}
+  return null;
+}
+function _saveBgSettings(s) {
+  localStorage.setItem('bg-settings', JSON.stringify(s));
+}
+let _bgCfg = Object.assign({ mode:'particles', preset:'hyperion' }, _loadBgSettings());
+
+function _getPalette() {
+  const p = _bgPresets[_bgCfg.preset] || _bgPresets.hyperion;
+  return p;
+}
+
+// ---- 2D Particles ----
+function _bgInitParticles() {
   const canvas = document.getElementById('bg-canvas');
   if (!canvas) return;
+  _bgStop();
   const ctx = canvas.getContext('2d');
   let W, H;
-
-  function resize() {
-    W = canvas.width = window.innerWidth;
-    H = canvas.height = window.innerHeight;
-  }
+  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
   resize();
   window.addEventListener('resize', resize);
 
-  const palette = ['#7c3aed', '#00f3ff', '#ff0055', '#a78bfa', '#06b6d4', '#f472b6'];
-  const count = 90;
+  const palette = _getPalette();
+  const count = _bgCfg.preset === 'breathing' ? 60 : 90;
+  const isBreathing = _bgCfg.preset === 'breathing';
+  const breathColor = palette[0];
   _bgParticles = [];
   for (let i = 0; i < count; i++) {
     _bgParticles.push({
-      x: Math.random() * W,
-      y: Math.random() * H,
-      vx: (Math.random() - 0.5) * 0.3,
-      vy: (Math.random() - 0.5) * 0.3,
+      x: Math.random() * W, y: Math.random() * H,
+      vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3,
       r: Math.random() * 2.5 + 0.5,
-      color: palette[Math.floor(Math.random() * palette.length)],
+      color: isBreathing ? breathColor : palette[Math.floor(Math.random() * palette.length)],
       alpha: Math.random() * 0.35 + 0.08,
-      pulse: Math.random() * Math.PI * 2
+      pulse: Math.random() * Math.PI * 2,
+      phase: Math.random() * Math.PI * 2
     });
   }
 
-  function drawBackground() {
+  let bgTime = 0;
+  function draw() {
     ctx.clearRect(0, 0, W, H);
     const g = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, Math.max(W, H) * 0.7);
     g.addColorStop(0, 'rgba(30, 10, 60, 0.4)');
@@ -2920,9 +2947,14 @@ function initBgCanvas() {
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, W, H);
 
+    bgTime += 0.02;
+    const breathFactor = isBreathing ? 0.5 + 0.5 * Math.sin(bgTime * 0.8) : 1;
+
     for (const p of _bgParticles) {
       p.pulse += 0.02;
-      const sAlpha = p.alpha * (0.6 + 0.4 * Math.sin(p.pulse));
+      const sAlpha = isBreathing
+        ? p.alpha * breathFactor
+        : p.alpha * (0.6 + 0.4 * Math.sin(p.pulse));
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
       ctx.fillStyle = p.color;
@@ -2952,30 +2984,170 @@ function initBgCanvas() {
         }
       }
     }
-  }
 
-  function update() {
     for (const p of _bgParticles) {
-      p.x += p.vx;
-      p.y += p.vy;
-      if (p.x < -10) p.x = W + 10;
-      if (p.x > W + 10) p.x = -10;
-      if (p.y < -10) p.y = H + 10;
-      if (p.y > H + 10) p.y = -10;
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < -10) p.x = W + 10; if (p.x > W + 10) p.x = -10;
+      if (p.y < -10) p.y = H + 10; if (p.y > H + 10) p.y = -10;
     }
+    _bgRAF = requestAnimationFrame(draw);
   }
-
-  function loop() {
-    update();
-    drawBackground();
-    requestAnimationFrame(loop);
-  }
-  loop();
+  draw();
 }
 
-// Auto-init on load
+// ---- 3D World ----
+function _bgInit3D() {
+  const canvas = document.getElementById('bg-canvas');
+  if (!canvas || typeof THREE === 'undefined') return;
+  _bgStop();
+
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 200);
+  camera.position.z = 35;
+
+  const palette = _getPalette();
+  const geos = [
+    new THREE.IcosahedronGeometry(1, 0),
+    new THREE.OctahedronGeometry(1, 0),
+    new THREE.DodecahedronGeometry(1, 0),
+    new THREE.TorusKnotGeometry(0.6, 0.3, 48, 6),
+    new THREE.TorusGeometry(0.7, 0.25, 12, 24),
+    new THREE.ConeGeometry(0.8, 1.2, 6)
+  ];
+
+  const objects = [];
+  const count = _bgCfg.preset === 'breathing' ? 60 : 40;
+  for (let i = 0; i < count; i++) {
+    const g = geos[i % geos.length];
+    const c = palette[i % palette.length];
+    const mat = new THREE.MeshPhongMaterial({ color: c, transparent: true, opacity: 0.5 + Math.random() * 0.3, shininess: 20, flatShading: true });
+    const m = new THREE.Mesh(g, mat);
+    const s = 0.2 + Math.random() * 0.6;
+    m.scale.set(s, s, s);
+    m.position.set((Math.random() - 0.5) * 70, (Math.random() - 0.5) * 50, (Math.random() - 0.5) * 30);
+    m.rotation.set(Math.random() * 6, Math.random() * 6, Math.random() * 6);
+    m.userData = {
+      rx: (Math.random() - 0.5) * 0.008, ry: (Math.random() - 0.5) * 0.008, rz: (Math.random() - 0.5) * 0.004,
+      baseY: m.position.y, phase: Math.random() * Math.PI * 2,
+      speed: 0.003 + Math.random() * 0.004, amp: 0.2 + Math.random() * 0.6
+    };
+    scene.add(m);
+    objects.push(m);
+  }
+
+  const ambient = new THREE.AmbientLight(0x404060, 0.6);
+  scene.add(ambient);
+  const d1 = new THREE.DirectionalLight(0xfff0f5, 0.8);
+  d1.position.set(15, 20, 25);
+  scene.add(d1);
+  const d2 = new THREE.DirectionalLight(0x4040ff, 0.3);
+  d2.position.set(-15, -10, -20);
+  scene.add(d2);
+
+  let mx = 0, my = 0;
+  const onMouse = e => { mx = (e.clientX / window.innerWidth) * 2 - 1; my = -(e.clientY / window.innerHeight) * 2 + 1; };
+  document.addEventListener('mousemove', onMouse);
+
+  let time = 0;
+  function anim() {
+    time += 0.01;
+    const breath = _bgCfg.preset === 'breathing' ? 0.4 + 0.6 * Math.sin(time * 0.8) : 1;
+    for (const o of objects) {
+      o.rotation.x += o.userData.rx; o.rotation.y += o.userData.ry; o.rotation.z += o.userData.rz;
+      o.position.y = o.userData.baseY + Math.sin(time * o.userData.speed * 10 + o.userData.phase) * o.userData.amp * breath;
+      o.material.opacity = (0.4 + Math.random() * 0.001) * breath;
+    }
+    camera.position.x += (mx * 4 - camera.position.x) * 0.015;
+    camera.position.y += (my * 3 - camera.position.y) * 0.015;
+    camera.lookAt(0, 0, 0);
+    renderer.render(scene, camera);
+    _bgRAF = requestAnimationFrame(anim);
+  }
+  anim();
+
+  _bg3D = { renderer, scene, camera, objects, onMouse };
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+}
+
+function _bgStop() {
+  if (_bgRAF) { cancelAnimationFrame(_bgRAF); _bgRAF = null; }
+  if (_bg3D) {
+    document.removeEventListener('mousemove', _bg3D.onMouse);
+    _bg3D.renderer.dispose();
+    _bg3D = null;
+  }
+  _bgParticles = [];
+}
+
+function initBg() {
+  if (_bgCfg.mode === '3d') _bgInit3D();
+  else _bgInitParticles();
+}
+
+// ---- Settings UI ----
+function openBgSettings() {
+  const existing = document.getElementById('bg-settings-modal');
+  if (existing) existing.remove();
+
+  const is3D = _bgCfg.mode === '3d';
+  const curPreset = _bgCfg.preset;
+
+  const m = document.createElement('div');
+  m.id = 'bg-settings-modal';
+  m.className = 'modal-overlay';
+  m.onclick = e => { if (e.target === m) m.remove(); };
+  m.innerHTML = `
+    <div class="modal-panel" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3>🎨 Personalizar Fondo</h3>
+        <button class="modal-close" onclick="document.getElementById('bg-settings-modal').remove()">✕</button>
+      </div>
+      <div class="modal-body">
+        <label>Motor</label>
+        <div class="opt-group">
+          <button class="opt-btn ${!is3D ? 'active' : ''}" onclick="setBgMode('particles')">✨ Partículas 2D</button>
+          <button class="opt-btn ${is3D ? 'active' : ''}" onclick="setBgMode('3d')">🌌 Mundo 3D</button>
+        </div>
+        <label>Paleta de color</label>
+        <div class="opt-group">
+          <button class="opt-btn ${curPreset === 'hyperion' ? 'active' : ''}" onclick="setBgPreset('hyperion')">HYPERION</button>
+          <button class="opt-btn ${curPreset === 'rainbow' ? 'active' : ''}" onclick="setBgPreset('rainbow')">Arcoíris</button>
+          <button class="opt-btn ${curPreset === 'aurora' ? 'active' : ''}" onclick="setBgPreset('aurora')">Aurora</button>
+          <button class="opt-btn ${curPreset === 'fire' ? 'active' : ''}" onclick="setBgPreset('fire')">Fuego</button>
+          <button class="opt-btn ${curPreset === 'ocean' ? 'active' : ''}" onclick="setBgPreset('ocean')">Océano</button>
+          <button class="opt-btn ${curPreset === 'breathing' ? 'active' : ''}" onclick="setBgPreset('breathing')">Respiración</button>
+        </div>
+        <p class="modal-desc">✨ Partículas 2D — clásicas, ligeras y conectadas<br>🌌 Mundo 3D — figuras geométricas flotando en el espacio</p>
+      </div>
+    </div>`;
+  document.body.appendChild(m);
+}
+
+function setBgMode(mode) {
+  _bgCfg.mode = mode;
+  _saveBgSettings(_bgCfg);
+  initBg();
+  document.querySelectorAll('#bg-settings-modal [onclick*="setBgMode"]').forEach(b => b.classList.toggle('active', b.getAttribute('onclick').includes(mode)));
+}
+
+function setBgPreset(preset) {
+  _bgCfg.preset = preset;
+  _saveBgSettings(_bgCfg);
+  initBg();
+  document.querySelectorAll('#bg-settings-modal [onclick*="setBgPreset"]').forEach(b => b.classList.toggle('active', b.getAttribute('onclick').includes(preset)));
+}
+
+// Auto-init
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initBgCanvas);
+  document.addEventListener('DOMContentLoaded', initBg);
 } else {
-  initBgCanvas();
+  initBg();
 }

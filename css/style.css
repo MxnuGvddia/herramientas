@@ -344,8 +344,60 @@ input:focus, select:focus, textarea:focus {
 ::-webkit-scrollbar-thumb { background: rgba(124,58,237,.3); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(124,58,237,.5); }
 
-/* Tabs styling */
-.tabs button { font-size:.8rem !important; padding:6px 10px !important; }
+/* Background settings modal */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 999;
+  background: rgba(2,2,5,.7);
+  display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.modal-panel {
+  background: rgba(10,10,25,.92);
+  border: 1px solid rgba(124,58,237,.2);
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 480px;
+  width: 90%;
+  box-shadow: 0 8px 48px rgba(0,0,0,.5), 0 0 40px rgba(124,58,237,.05);
+}
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px;
+}
+.modal-header h3 { font-size: 1.2rem; color: var(--text-bright); }
+.modal-close {
+  width: 30px; height: 30px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,.04); border: 1px solid var(--border);
+  color: var(--muted); cursor: pointer; font-size: 1rem;
+  transition: all .15s;
+}
+.modal-close:hover { background: rgba(255,255,255,.08); color: var(--text); }
+.modal-body label {
+  font-size: .8rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .5px; color: var(--muted); margin-bottom: 8px; margin-top: 16px;
+}
+.modal-body label:first-child { margin-top: 0; }
+.opt-group { display: flex; gap: 6px; flex-wrap: wrap; }
+.opt-btn {
+  padding: 7px 14px; border-radius: 8px;
+  font-size: .8rem; font-weight: 600;
+  background: rgba(255,255,255,.04); color: var(--text);
+  border: 1px solid var(--border); cursor: pointer;
+  transition: all .15s;
+}
+.opt-btn:hover { background: rgba(255,255,255,.07); }
+.opt-btn.active {
+  background: rgba(124,58,237,.15);
+  color: #a78bfa;
+  border-color: rgba(124,58,237,.3);
+}
+.modal-desc {
+  font-size: .75rem; color: var(--muted);
+  margin-top: 16px; text-align: center;
+  line-height: 1.5;
+}
 
 /* Range input styling */
 input[type="range"] {

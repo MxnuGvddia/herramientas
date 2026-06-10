@@ -222,17 +222,6 @@ const TOOLS = [
     init: () => { jsonFormat(); }
   },
   {
-    id: "ip", icon: "🌐", name: "Mi IP", desc: "Muestra tu dirección IP pública e información de red",
-    render: () => `
-      <div style="text-align:center;padding:20px">
-        <div id="ip-display" style="font-size:2rem;font-weight:700">Cargando...</div>
-        <div id="ip-info" style="margin-top:8px;color:var(--muted)"></div>
-        <button class="btn" style="margin-top:16px" onclick="ipRefresh()">🔄 Refrescar</button>
-      </div>
-    `,
-    init: () => { ipRefresh(); }
-  },
-  {
     id: "uuid", icon: "🆔", name: "Generador UUID", desc: "Genera identificadores únicos UUID v4",
     render: () => `
       <div style="text-align:center;padding:20px">

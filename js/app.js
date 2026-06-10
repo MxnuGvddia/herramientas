@@ -127,17 +127,20 @@ function calcTab(tab) {
           <button class="btn btn-secondary" style="padding:2px 8px;font-size:.75rem" onclick="resetGraphView()">⟲</button>
         </div>
         <div style="display:flex;gap:4px;margin-bottom:6px;flex-wrap:wrap;font-size:.75rem">
+          <span style="padding:2px 6px;font-weight:600;color:var(--primary)">Tipo:</span>
+          <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('2*x+1')">Lineal</button>
+          <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('x*x-4*x+3')">Cuadrática</button>
+          <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('Math.pow(2,x)')">Exponencial</button>
+          <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('1/x')">Prop. inversa</button>
+          <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('x<0 ? -x : x*x')">Seccionada</button>
+          <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('Math.log(x)')">Logarítmica</button>
+          <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('Math.abs(x)')">Absoluto</button>
+          <span style="padding:2px 6px;font-weight:600;color:var(--muted)">·</span>
           <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('Math.sin(x)')">sin(x)</button>
           <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('Math.cos(x)')">cos(x)</button>
-          <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('x*x')">x²</button>
-          <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('1/x')">1/x</button>
-          <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('Math.tan(x)')">tan(x)</button>
-          <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('Math.sqrt(x)')">√x</button>
           <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('x*x*x')">x³</button>
+          <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('Math.sqrt(x)')">√x</button>
           <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('Math.exp(x)')">eˣ</button>
-          <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('Math.log(x)')">ln(x)</button>
-          <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('Math.abs(x)')">|x|</button>
-          <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('Math.sin(1/x)')">sin(1/x)</button>
         </div>
         <canvas id="graph-canvas" width="500" height="350"></canvas>
       </div>
@@ -1032,23 +1035,6 @@ function jsonMinify() {
 }
 function jsonValidate() {
   try { JSON.parse($("json-input").value); $("json-output").textContent = "✅ JSON válido"; } catch(e) { $("json-output").textContent = "❌ JSON inválido: " + e.message; }
-}
-
-async function ipRefresh() {
-  $("ip-display").textContent = "Cargando...";
-  try {
-    const r = await fetch("https://api.ipify.org?format=json");
-    const d = await r.json();
-    $("ip-display").textContent = d.ip;
-    try {
-      const r2 = await fetch(`https://ipapi.co/${d.ip}/json/`);
-      const d2 = await r2.json();
-      $("ip-info").innerHTML = `${d2.city || ""}, ${d2.region || ""}, ${d2.country_name || ""} &middot; ${d2.org || ""}`;
-    } catch(e) { $("ip-info").textContent = ""; }
-  } catch(e) {
-    $("ip-display").textContent = "Error";
-    $("ip-info").textContent = "No se pudo obtener la IP";
-  }
 }
 
 function uuidGen(count) {

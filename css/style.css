@@ -38,18 +38,80 @@ body {
 .header {
   background: linear-gradient(135deg, rgba(124,58,237,.35), rgba(0,243,255,.08));
   border-bottom: 1px solid var(--border-glow);
-  padding: 28px 0;
+  padding: 24px 0;
   backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
-.header-content { text-align: center; }
+.header .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.header-content { flex: 1; }
 .logo {
-  font-size: 1.6rem; font-weight: 800; text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+.logo-icon { font-size: 1.5rem; }
+.logo-text {
+  font-size: 1.5rem; font-weight: 800;
   background: linear-gradient(135deg, #f8fafc, #a78bfa);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
-.tagline { margin-top: 4px; font-size: .85rem; opacity: .6; color: var(--neon-cyan); letter-spacing: .3px; }
+.tagline {
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: .8rem;
+}
+.tagline-text { color: var(--muted); letter-spacing: .2px; }
+.tag-badge {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 4px;
+  font-size: .65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  background: rgba(0,243,255,.1);
+  color: var(--neon-cyan);
+  border: 1px solid rgba(0,243,255,.15);
+}
+.tool-count-badge {
+  background: rgba(124,58,237,.12);
+  color: #a78bfa;
+  border-color: rgba(124,58,237,.2);
+}
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: 16px;
+}
+.gh-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  color: var(--muted);
+  background: rgba(255,255,255,.04);
+  border: 1px solid var(--border);
+  transition: all .15s;
+}
+.gh-link:hover {
+  color: var(--text-bright);
+  background: rgba(255,255,255,.08);
+  border-color: rgba(124,58,237,.3);
+  box-shadow: 0 0 16px rgba(0,243,255,.05);
+}
 
 /* Tool Grid */
 .tool-grid {

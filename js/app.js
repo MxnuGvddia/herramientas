@@ -7,14 +7,12 @@ function homePage() {
   const layout = getLayout();
   const tools = layout ? layout.map(id => TOOLS.find(t => t.id === id)).filter(Boolean) : TOOLS;
   const isEdit = window._layoutEditing || false;
+  const editBar = isEdit ? `<div style="display:flex;gap:8px;align-items:center;margin-bottom:16px;padding:12px 16px;background:rgba(0,243,255,.04);border:1px solid rgba(0,243,255,.1);border-radius:10px">
+      <span style="font-size:.8rem;color:var(--muted)">Arrastra las tarjetas para reordenar</span>
+      <button class="btn" onclick="saveLayout()" style="font-size:.8rem;padding:6px 14px;margin-left:auto">💾 Guardar layout</button>
+    </div>` : '';
   page.innerHTML = `
-    <div class="home-toolbar" style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;align-items:center">
-      <button class="btn btn-secondary" onclick="toggleLayoutEdit()" style="font-size:.8rem;padding:6px 14px">${isEdit ? '✏️ Terminar edición' : '✏️ Editar Layout'}</button>
-      <button class="btn btn-secondary" onclick="downloadSite()" style="font-size:.8rem;padding:6px 14px">📥 Descargar sitio</button>
-      ${isEdit ? '<span style="font-size:.8rem;color:var(--muted)">Arrastra las tarjetas para reordenar</span>' : ''}
-      ${isEdit ? '<button class="btn" onclick="saveLayout()" style="font-size:.8rem;padding:6px 14px">💾 Guardar layout</button>' : ''}
-    </div>
-    
+    ${editBar}
     <div class="tool-grid ${isEdit ? 'editing' : ''}" id="tool-grid">
       ${tools.map(t => `
         <div class="tool-card" draggable="${isEdit}" data-tool-id="${t.id}"${isEdit ? '' : ` onclick="navigate('${t.id}')"`}>
@@ -2788,6 +2786,8 @@ function saveLayout() {
 }
 function toggleLayoutEdit() {
   window._layoutEditing = !window._layoutEditing;
+  const btn = document.getElementById('layout-toggle-btn');
+  if (btn) btn.textContent = window._layoutEditing ? '💾' : '✏️';
   homePage();
 }
 let _dragSrc = null;

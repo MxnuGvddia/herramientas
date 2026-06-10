@@ -2890,10 +2890,74 @@ const _csTemplates = {
   json:'{\n  "nombre": "CodeStudio",\n  "version": "1.0",\n  "lenguajes": ["HTML","CSS","JS","Python"],\n  "opensource": true\n}'
 };
 
+let _csLayout = { pos: 'right', ratio: 50 };
+try { const s = localStorage.getItem('codestudio_layout'); if (s) Object.assign(_csLayout, JSON.parse(s)); } catch(e) {}
+
+function csSetLayout(pos) {
+  _csLayout.pos = pos;
+  localStorage.setItem('codestudio_layout', JSON.stringify(_csLayout));
+  const main = document.getElementById('cs-main');
+  const preview = document.getElementById('cs-preview');
+  const resizer = document.getElementById('cs-resizer');
+  if (!main) return;
+  main.className = 'cs-main';
+  if (pos === 'bottom') main.classList.add('cs-col');
+  if (pos === 'hidden') { preview.style.display = 'none'; resizer.style.display = 'none'; }
+  else { preview.style.display = ''; resizer.style.display = ''; }
+  document.querySelectorAll('.cs-layout-btn').forEach(b => b.classList.toggle('active', b.dataset.pos === pos));
+  csApplyRatio();
+}
+
+function csApplyRatio() {
+  const editor = document.getElementById('cs-editor');
+  const preview = document.getElementById('cs-preview');
+  if (!editor || !preview || _csLayout.pos === 'hidden') return;
+  editor.style.flex = `${_csLayout.ratio} 1 0`;
+  preview.style.flex = `${100 - _csLayout.ratio} 1 0`;
+}
+
+function csInitResizer() {
+  const resizer = document.getElementById('cs-resizer');
+  if (!resizer) return;
+  resizer.addEventListener('mousedown', e => {
+    e.preventDefault();
+    const main = document.getElementById('cs-main');
+    const editor = document.getElementById('cs-editor');
+    const preview = document.getElementById('cs-preview');
+    if (!main || !editor || !preview) return;
+    const isCol = _csLayout.pos === 'bottom';
+    const start = isCol ? e.clientY : e.clientX;
+    const startRatio = _csLayout.ratio;
+
+    function onMove(ev) {
+      const delta = isCol ? ev.clientY - start : ev.clientX - start;
+      const total = isCol ? main.offsetHeight : main.offsetWidth;
+      if (total === 0) return;
+      const pct = (delta / total) * 100;
+      _csLayout.ratio = Math.max(20, Math.min(80, startRatio + pct));
+      csApplyRatio();
+    }
+    function onUp() {
+      localStorage.setItem('codestudio_layout', JSON.stringify(_csLayout));
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+    }
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  });
+}
+
 function csInit() {
   _csFiles = [{ name:'index.html', lang:'html', content:_csTemplates.html }];
   _csCurrent = 0;
-  setTimeout(() => { csRenderTabs(); csRenderEditor(); csUpdatePreview(); }, 50);
+  setTimeout(() => {
+    csRenderTabs();
+    csRenderEditor();
+    csUpdatePreview();
+    csSetLayout(_csLayout.pos);
+    csInitResizer();
+    csApplyRatio();
+  }, 50);
 }
 
 function csRenderTabs() {

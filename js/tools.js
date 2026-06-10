@@ -367,13 +367,19 @@ const TOOLS = [
           <div class="cs-sep"></div>
           <button class="cs-btn cs-btn-primary" onclick="csRun()">▶ Ejecutar</button>
           <button class="cs-btn cs-btn-primary" onclick="csLiveWin()">🔗 Live Server</button>
+          <div class="cs-sep"></div>
+          <span class="cs-lbl">Layout</span>
+          <button class="cs-btn cs-layout-btn" data-pos="right" onclick="csSetLayout('right')" title="Preview a la derecha">◧</button>
+          <button class="cs-btn cs-layout-btn" data-pos="bottom" onclick="csSetLayout('bottom')" title="Preview abajo">⇅</button>
+          <button class="cs-btn cs-layout-btn" data-pos="hidden" onclick="csSetLayout('hidden')" title="Solo editor">⊞</button>
         </div>
         <div class="cs-tabs" id="cs-tabs"></div>
-        <div class="cs-main">
-          <div class="cs-editor">
+        <div class="cs-main" id="cs-main">
+          <div class="cs-editor" id="cs-editor">
             <div class="cs-gutter" id="cs-gutter"></div>
             <textarea class="cs-textarea" id="cs-code" spellcheck="false" oninput="csUpdateGutter()" onscroll="csSyncScroll()" onkeydown="csHandleKey(event)"></textarea>
           </div>
+          <div class="cs-resizer" id="cs-resizer"></div>
           <div class="cs-preview" id="cs-preview">
             <iframe class="cs-iframe" id="cs-iframe"></iframe>
             <div class="cs-preview-empty" id="cs-preview-empty">

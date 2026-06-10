@@ -45,17 +45,299 @@ window.addEventListener("hashchange", () => {
 
 homePage();
 
-/* Tool functions */
+/* Calculator Engine — sub-tabs */
+function calcTab(tab) {
+  const c = $("calc-engine-content");
+  const t = {
+    basic: ` 
+      <input type="text" id="calc-expr" placeholder="Ej: 2 + 2 * 5" value="2+2" onkeydown="if(event.key==='Enter')calcEval()" style="font-family:monospace;font-size:1.1rem">
+      <div class="calc-grid">
+        <button class="btn calc-key" onclick="calcInsert('(')">(</button>
+        <button class="btn calc-key" onclick="calcInsert(')')">)</button>
+        <button class="btn calc-key calc-op" onclick="calcClear()">C</button>
+        <button class="btn calc-key calc-op" onclick="calcBack()">⌫</button>
+        <button class="btn calc-key" onclick="calcInsert('7')">7</button>
+        <button class="btn calc-key" onclick="calcInsert('8')">8</button>
+        <button class="btn calc-key" onclick="calcInsert('9')">9</button>
+        <button class="btn calc-key calc-op" onclick="calcInsert('/')">÷</button>
+        <button class="btn calc-key" onclick="calcInsert('4')">4</button>
+        <button class="btn calc-key" onclick="calcInsert('5')">5</button>
+        <button class="btn calc-key" onclick="calcInsert('6')">6</button>
+        <button class="btn calc-key calc-op" onclick="calcInsert('*')">×</button>
+        <button class="btn calc-key" onclick="calcInsert('1')">1</button>
+        <button class="btn calc-key" onclick="calcInsert('2')">2</button>
+        <button class="btn calc-key" onclick="calcInsert('3')">3</button>
+        <button class="btn calc-key calc-op" onclick="calcInsert('-')">−</button>
+        <button class="btn calc-key" onclick="calcInsert('0')">0</button>
+        <button class="btn calc-key" onclick="calcInsert('.')">.</button>
+        <button class="btn calc-key calc-op" onclick="calcInsert('Math.PI')">π</button>
+        <button class="btn calc-key calc-op" onclick="calcInsert('+')">+</button>
+        <button class="calc-eq" onclick="calcEval()">= Calcular</button>
+      </div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin:8px 0;font-size:.8rem">
+        <button class="btn btn-secondary" style="padding:4px 8px;font-size:.75rem" onclick="calcInsert('Math.sin(')">sin</button>
+        <button class="btn btn-secondary" style="padding:4px 8px;font-size:.75rem" onclick="calcInsert('Math.cos(')">cos</button>
+        <button class="btn btn-secondary" style="padding:4px 8px;font-size:.75rem" onclick="calcInsert('Math.tan(')">tan</button>
+        <button class="btn btn-secondary" style="padding:4px 8px;font-size:.75rem" onclick="calcInsert('Math.log(')">ln</button>
+        <button class="btn btn-secondary" style="padding:4px 8px;font-size:.75rem" onclick="calcInsert('Math.log10(')">log</button>
+        <button class="btn btn-secondary" style="padding:4px 8px;font-size:.75rem" onclick="calcInsert('Math.sqrt(')">√</button>
+        <button class="btn btn-secondary" style="padding:4px 8px;font-size:.75rem" onclick="calcInsert('Math.abs(')">|x|</button>
+        <button class="btn btn-secondary" style="padding:4px 8px;font-size:.75rem" onclick="calcInsert('**')">xⁿ</button>
+        <button class="btn btn-secondary" style="padding:4px 8px;font-size:.75rem" onclick="calcInsert('Math.E')">e</button>
+        <button class="btn btn-secondary" style="padding:4px 8px;font-size:.75rem" onclick="calcInsert('%')">%</button>
+        <button class="btn btn-secondary" style="padding:4px 8px;font-size:.75rem" onclick="calcInsert('!')">!</button>
+      </div>
+      <div class="result" id="calc-result"></div>
+    `,
+    graph: `
+      <div class="calc-canvas-wrap">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+          <input type="text" id="graph-fx" value="Math.sin(x)" style="flex:1;font-family:monospace" placeholder="f(x) = " onkeydown="if(event.key==='Enter')graphPlot()">
+          <button class="btn" onclick="graphPlot()">📈 Graficar</button>
+        </div>
+        <div style="display:flex;gap:12px;margin-bottom:8px;font-size:.8rem;flex-wrap:wrap">
+          <label>X min: <input type="number" id="graph-xmin" value="-10" style="width:70px;padding:4px" onchange="graphPlot()"></label>
+          <label>X max: <input type="number" id="graph-xmax" value="10" style="width:70px;padding:4px" onchange="graphPlot()"></label>
+          <label>Y min: <input type="number" id="graph-ymin" value="-5" style="width:70px;padding:4px" onchange="graphPlot()"></label>
+          <label>Y max: <input type="number" id="graph-ymax" value="5" style="width:70px;padding:4px" onchange="graphPlot()"></label>
+          <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="document.getElementById('graph-fx').value='Math.sin(x)';graphPlot()">sin(x)</button>
+          <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="document.getElementById('graph-fx').value='Math.cos(x)';graphPlot()">cos(x)</button>
+          <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="document.getElementById('graph-fx').value='x*x';graphPlot()">x²</button>
+          <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="document.getElementById('graph-fx').value='1/x';graphPlot()">1/x</button>
+        </div>
+        <canvas id="graph-canvas" width="500" height="350"></canvas>
+      </div>
+    `,
+    calc: `
+      <div style="margin-bottom:12px">
+        <b style="font-size:.9rem">Derivada numérica</b>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0">
+          <input type="text" id="calc-deriv-fx" value="x*x" style="flex:1;font-family:monospace" placeholder="f(x)">
+          <label style="font-size:.8rem">x = <input type="number" id="calc-deriv-x" value="2" style="width:60px;padding:4px"></label>
+          <button class="btn" style="padding:6px 14px;font-size:.85rem" onclick="calcDeriv()">f'(x)</button>
+          <span class="result-box" id="calc-deriv-result" style="padding:6px 12px;font-size:.9rem">—</span>
+        </div>
+      </div>
+      <div style="margin-bottom:12px">
+        <b style="font-size:.9rem">Integral definida</b>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0">
+          <input type="text" id="calc-int-fx" value="x*x" style="flex:1;font-family:monospace" placeholder="f(x)">
+          <label style="font-size:.8rem">a = <input type="number" id="calc-int-a" value="0" style="width:60px;padding:4px"></label>
+          <label style="font-size:.8rem">b = <input type="number" id="calc-int-b" value="1" style="width:60px;padding:4px"></label>
+          <button class="btn" style="padding:6px 14px;font-size:.85rem" onclick="calcInt()">∫ f(x)dx</button>
+          <span class="result-box" id="calc-int-result" style="padding:6px 12px;font-size:.9rem">—</span>
+        </div>
+      </div>
+      <div style="margin-bottom:12px">
+        <b style="font-size:.9rem">Límite</b>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0">
+          <input type="text" id="calc-lim-fx" value="1/x" style="flex:1;font-family:monospace" placeholder="f(x)">
+          <label style="font-size:.8rem">x → <input type="number" id="calc-lim-x" value="0" style="width:60px;padding:4px"></label>
+          <button class="btn" style="padding:6px 14px;font-size:.85rem" onclick="calcLim()">lim f(x)</button>
+          <span class="result-box" id="calc-lim-result" style="padding:6px 12px;font-size:.9rem">—</span>
+        </div>
+      </div>
+      <div style="margin-bottom:12px">
+        <b style="font-size:.9rem">Sumatoria</b>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0">
+          <input type="text" id="calc-sum-fx" value="i*i" style="flex:1;font-family:monospace" placeholder="f(i)">
+          <label style="font-size:.8rem">i = <input type="number" id="calc-sum-from" value="1" style="width:60px;padding:4px"></label>
+          <label style="font-size:.8rem">hasta <input type="number" id="calc-sum-to" value="10" style="width:60px;padding:4px"></label>
+          <button class="btn" style="padding:6px 14px;font-size:.85rem" onclick="calcSum()">∑ f(i)</button>
+          <span class="result-box" id="calc-sum-result" style="padding:6px 12px;font-size:.9rem">—</span>
+        </div>
+      </div>
+      <div style="font-size:.8rem;color:var(--muted)">Usa x como variable, ejemplo: x*x, Math.sin(x), 1/x, Math.exp(x)</div>
+    `,
+    phys: `
+      <p style="font-size:.9rem;margin-bottom:8px"><b>Cinemática — MRU / MRUV / MRUA</b></p>
+      <div class="calc-phys-grid">
+        <div class="result-box" style="padding:12px">
+          <b>MRU</b> (v=cte)
+          <div style="margin-top:6px;font-size:.8rem">
+            <label>d (m): <input type="number" id="phys-mru-d" value="100" style="padding:4px" oninput="physMRU()"></label>
+            <label>t (s): <input type="number" id="phys-mru-t" value="10" style="padding:4px" oninput="physMRU()"></label>
+            <label>v (m/s): <input type="number" id="phys-mru-v" value="10" style="padding:4px" readonly></label>
+          </div>
+        </div>
+        <div class="result-box" style="padding:12px">
+          <b>MRUV</b> (a=cte)
+          <div style="margin-top:6px;font-size:.8rem">
+            <label>v₀ (m/s): <input type="number" id="phys-mruv-v0" value="0" style="padding:4px" oninput="physMRUV()"></label>
+            <label>a (m/s²): <input type="number" id="phys-mruv-a" value="9.8" style="padding:4px" oninput="physMRUV()"></label>
+            <label>t (s): <input type="number" id="phys-mruv-t" value="5" style="padding:4px" oninput="physMRUV()"></label>
+            <label>v<sub>f</sub> (m/s): <input type="number" id="phys-mruv-vf" style="padding:4px" readonly></label>
+            <label>d (m): <input type="number" id="phys-mruv-d" style="padding:4px" readonly></label>
+          </div>
+        </div>
+        <div class="result-box" style="padding:12px">
+          <b>MRUA</b> (v²)
+          <div style="margin-top:6px;font-size:.8rem">
+            <label>v₀ (m/s): <input type="number" id="phys-mrua-v0" value="0" style="padding:4px" oninput="physMRUA()"></label>
+            <label>v<sub>f</sub> (m/s): <input type="number" id="phys-mrua-vf" value="20" style="padding:4px" oninput="physMRUA()"></label>
+            <label>a (m/s²): <input type="number" id="phys-mrua-a" value="9.8" style="padding:4px" oninput="physMRUA()"></label>
+            <label>d (m): <input type="number" id="phys-mrua-d" style="padding:4px" readonly></label>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:12px;font-size:.8rem;color:var(--muted)">
+        MRU: v = d/t &nbsp;|&nbsp; MRUV: v<sub>f</sub> = v₀ + at, d = v₀t + ½at² &nbsp;|&nbsp; MRUA: v<sub>f</sub>² = v₀² + 2ad
+      </div>
+    `,
+    complex: `
+      <p style="font-size:.9rem;margin-bottom:8px"><b>Números complejos (a + bi)</b></p>
+      <div class="split" style="margin-bottom:8px">
+        <div><label>z₁ = <input type="text" id="comp-z1" value="3+4i" style="font-family:monospace" placeholder="a+bi"></label></div>
+        <div><label>z₂ = <input type="text" id="comp-z2" value="1-2i" style="font-family:monospace" placeholder="a+bi"></label></div>
+      </div>
+      <div class="calc-comp-grid">
+        <button class="btn btn-secondary" onclick="compOp('+')">z₁+z₂</button>
+        <button class="btn btn-secondary" onclick="compOp('-')">z₁−z₂</button>
+        <button class="btn btn-secondary" onclick="compOp('*')">z₁·z₂</button>
+        <button class="btn btn-secondary" onclick="compOp('/')">z₁÷z₂</button>
+      </div>
+      <div id="comp-result" style="margin-top:8px"></div>
+      <div style="margin-top:8px;font-size:.8rem">
+        <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="compUnary('conj')">Conjugar z₁</button>
+        <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="compUnary('mod')">|z₁|</button>
+        <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="compUnary('arg')">arg(z₁)</button>
+      </div>
+    `,
+    bases: `
+      <p style="font-size:.9rem;margin-bottom:8px"><b>Conversor entre bases numéricas</b></p>
+      <div class="calc-bases-grid">
+        <div><label>Binario (2)</label><input type="text" id="base-bin" value="1010" oninput="baseConvert(2)" placeholder="1010"></div>
+        <div><label>Octal (8)</label><input type="text" id="base-oct" value="12" oninput="baseConvert(8)" placeholder="12"></div>
+        <div><label>Decimal (10)</label><input type="text" id="base-dec" value="10" oninput="baseConvert(10)" placeholder="10"></div>
+        <div><label>Hexadecimal (16)</label><input type="text" id="base-hex" value="A" oninput="baseConvert(16)" placeholder="A"></div>
+      </div>
+      <div id="base-result" class="result-box" style="margin-top:8px;font-size:.85rem">10<sub>10</sub> = 1010<sub>2</sub> = 12<sub>8</sub> = A<sub>16</sub></div>
+      <div style="margin-top:8px;font-size:.8rem;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="baseExamples()">Ejemplos</button>
+        <span style="color:var(--muted);line-height:2">Decimal → cualquier base</span>
+      </div>
+    `,
+    elec: `
+      <p style="font-size:.9rem;margin-bottom:8px"><b>Ley de Ohm y Resistencias</b></p>
+      <div class="calc-elec-grid" style="margin-bottom:12px">
+        <div class="result-box" style="padding:12px">
+          <b>Ley de Ohm</b>
+          <div style="margin-top:6px;font-size:.8rem">
+            <label>V (voltios): <input type="number" id="elec-v" value="12" style="padding:4px" oninput="elecOhm()"></label>
+            <label>I (amperios): <input type="number" id="elec-i" value="2" style="padding:4px" oninput="elecOhm()"></label>
+            <label>R (Ω): <input type="number" id="elec-r" style="padding:4px" readonly></label>
+          </div>
+        </div>
+        <div class="result-box" style="padding:12px">
+          <b>Resistencias en serie</b>
+          <div style="margin-top:6px;font-size:.8rem">
+            <label>R₁ (Ω): <input type="number" id="elec-rs1" value="100" style="padding:4px" oninput="elecSeries()"></label>
+            <label>R₂ (Ω): <input type="number" id="elec-rs2" value="200" style="padding:4px" oninput="elecSeries()"></label>
+            <label>R<sub>total</sub> (Ω): <input type="number" id="elec-rs-total" style="padding:4px" readonly></label>
+          </div>
+        </div>
+        <div class="result-box" style="padding:12px">
+          <b>Resistencias en paralelo</b>
+          <div style="margin-top:6px;font-size:.8rem">
+            <label>R₁ (Ω): <input type="number" id="elec-rp1" value="100" style="padding:4px" oninput="elecParalelo()"></label>
+            <label>R₂ (Ω): <input type="number" id="elec-rp2" value="100" style="padding:4px" oninput="elecParalelo()"></label>
+            <label>R<sub>total</sub> (Ω): <input type="number" id="elec-rp-total" style="padding:4px" readonly></label>
+          </div>
+        </div>
+      </div>
+      <div style="font-size:.8rem;color:var(--muted)">
+        V = I·R &nbsp;|&nbsp; Serie: R<sub>T</sub> = R₁ + R₂ + ... &nbsp;|&nbsp; Paralelo: 1/R<sub>T</sub> = 1/R₁ + 1/R₂ + ...
+      </div>
+    `,
+    chem: `
+      <p style="font-size:.9rem;margin-bottom:8px"><b>Química — Masa molar y estequiometría</b></p>
+      <div style="margin-bottom:12px">
+        <label style="font-size:.85rem">Fórmula química (ej: H2O, CO2, NaCl, C6H12O6):</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0">
+          <input type="text" id="chem-formula" value="H2O" style="flex:1;font-family:monospace" placeholder="H2O">
+          <button class="btn" style="padding:6px 14px;font-size:.85rem" onclick="chemMolarMass()">Calcular masa molar</button>
+        </div>
+        <div id="chem-result" style="margin-top:6px"></div>
+      </div>
+      <div style="margin-bottom:12px">
+        <b style="font-size:.85rem">Cálculo de moles</b>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0;font-size:.8rem">
+          <label>Masa (g): <input type="number" id="chem-mass" value="18" style="width:80px;padding:4px"></label>
+          <label>Masa molar (g/mol): <input type="number" id="chem-molar" value="18" style="width:80px;padding:4px"></label>
+          <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="chemMoles()">Calcular moles</button>
+          <span class="result-box" id="chem-moles-result" style="padding:4px 10px;font-size:.85rem">1.000 mol</span>
+        </div>
+      </div>
+      <p style="font-size:.8rem;margin-top:8px;color:var(--muted)">
+        n = m / M &nbsp;|&nbsp; Masas atómicas: H=1, C=12, N=14, O=16, Na=23, Cl=35.5, etc.
+      </p>
+    `,
+    stat: `
+      <p style="font-size:.9rem;margin-bottom:8px"><b>Estadística descriptiva</b></p>
+      <label>Datos (separados por coma):</label>
+      <input type="text" id="stat-data" value="23,45,67,12,89,34,56,78" style="font-family:monospace" onkeydown="if(event.key==='Enter')calcStat()">
+      <div class="btn-group">
+        <button class="btn" onclick="calcStat()">📊 Calcular</button>
+        <button class="btn btn-secondary" onclick="document.getElementById('stat-data').value='1,2,3,4,5,6,7,8,9,10';calcStat()">1-10</button>
+        <button class="btn btn-secondary" onclick="document.getElementById('stat-data').value='10,20,30,40,50';calcStat()">10-50</button>
+      </div>
+      <div id="stat-result" style="margin-top:8px">
+        <div class="calc-stat-grid"></div>
+      </div>
+    `,
+    rule3: `
+      <p style="font-size:.9rem;margin-bottom:8px"><b>Regla de tres simple</b></p>
+      <p style="font-size:.85rem;color:var(--muted);margin-bottom:12px">Si <b>A</b> corresponde a <b>B</b>, entonces <b>C</b> corresponde a <b>X</b></p>
+      <div style="display:flex;gap:12px;justify-content:center;align-items:end;flex-wrap:wrap;font-size:1.1rem">
+        <div style="text-align:center">
+          <label style="font-size:.85rem">A</label>
+          <input type="number" id="rule3-a" value="2" style="width:100px;padding:8px;text-align:center;font-size:1.2rem">
+        </div>
+        <div style="font-size:1.5rem;padding-bottom:8px">→</div>
+        <div style="text-align:center">
+          <label style="font-size:.85rem">B</label>
+          <input type="number" id="rule3-b" value="4" style="width:100px;padding:8px;text-align:center;font-size:1.2rem">
+        </div>
+        <div style="font-size:1.5rem;padding-bottom:8px">→</div>
+        <div style="text-align:center">
+          <label style="font-size:.85rem">C</label>
+          <input type="number" id="rule3-c" value="6" style="width:100px;padding:8px;text-align:center;font-size:1.2rem">
+        </div>
+        <div style="font-size:1.5rem;padding-bottom:8px">→</div>
+        <div style="text-align:center">
+          <label style="font-size:.85rem">X = ?</label>
+          <div class="result-box" id="rule3-result" style="width:100px;padding:8px;text-align:center;font-size:1.2rem;font-weight:700">12</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
+        <button class="btn" onclick="rule3Calc()">Calcular X</button>
+        <button class="btn btn-secondary" onclick="rule3Inverse()">🔄 Invertir (directa ↔ inversa)</button>
+      </div>
+      <div id="rule3-mode" style="text-align:center;margin-top:8px;font-size:.85rem;color:var(--muted)">Regla de tres <b>directa</b>: X = (B·C)/A</div>
+    `,
+  };
+  c.innerHTML = (t[tab] || t.basic) + `<div class="ad-banner" style="margin-top:16px"><div class="ad-placeholder">— Publicidad —</div></div>`;
+  if (tab === 'basic') { setTimeout(() => { calcEval(); }, 50); }
+  if (tab === 'graph') { setTimeout(() => { graphPlot(); }, 100); }
+  if (tab === 'stat') { setTimeout(() => { calcStat(); }, 50); }
+  if (tab === 'phys') { setTimeout(() => { physMRU(); physMRUV(); physMRUA(); }, 50); }
+  if (tab === 'elec') { setTimeout(() => { elecOhm(); elecSeries(); elecParalelo(); }, 50); }
+  if (tab === 'bases') { setTimeout(() => { baseConvert(10); }, 50); }
+}
+
+/* Basic calc helpers */
 function calcInsert(ch) {
   const inp = $("calc-expr");
+  if (!inp) return;
   const start = inp.selectionStart, end = inp.selectionEnd;
   inp.value = inp.value.substring(0, start) + ch + inp.value.substring(end);
   inp.selectionStart = inp.selectionEnd = start + ch.length;
   inp.focus(); calcEval();
 }
-function calcClear() { $("calc-expr").value = ""; $("calc-expr").focus(); calcEval(); }
+function calcClear() { const inp = $("calc-expr"); if (inp) { inp.value = ""; inp.focus(); calcEval(); } }
 function calcBack() {
   const inp = $("calc-expr");
+  if (!inp) return;
   const start = inp.selectionStart;
   if (start > 0) {
     inp.value = inp.value.substring(0, start-1) + inp.value.substring(inp.selectionEnd);
@@ -63,8 +345,282 @@ function calcBack() {
   }
   inp.focus(); calcEval();
 }
-function calcPi() {
-  calcInsert('(' + Math.PI + ')');
+function calcPi() { calcInsert('(' + Math.PI + ')'); }
+function calcEval() {
+  const expr = $("calc-expr")?.value.trim();
+  if (!expr) return;
+  try {
+    const result = Function(`"use strict"; return (${expr})`)();
+    $("calc-result").innerHTML = `<div class="result-box">${expr} = <strong>${result}</strong></div>`;
+  } catch (e) {
+    $("calc-result").innerHTML = `<div class="result-box error">Error: expresión inválida</div>`;
+  }
+}
+
+/* Graph plotter */
+function graphPlot() {
+  const canvas = $("graph-canvas");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  const W = canvas.width, H = canvas.height;
+  const fx = $("graph-fx").value.trim();
+  const xmin = parseFloat($("graph-xmin").value), xmax = parseFloat($("graph-xmax").value);
+  const ymin = parseFloat($("graph-ymin").value), ymax = parseFloat($("graph-ymax").value);
+  ctx.clearRect(0, 0, W, H);
+  const px = x => (x - xmin) / (xmax - xmin) * W;
+  const py = y => H - (y - ymin) / (ymax - ymin) * H;
+  ctx.strokeStyle = "#e2e8f0"; ctx.lineWidth = 0.5;
+  for (let i = Math.ceil(xmin); i <= Math.floor(xmax); i++) {
+    if (i === 0) continue;
+    ctx.beginPath(); ctx.moveTo(px(i), 0); ctx.lineTo(px(i), H); ctx.stroke();
+  }
+  for (let i = Math.ceil(ymin); i <= Math.floor(ymax); i++) {
+    if (i === 0) continue;
+    ctx.beginPath(); ctx.moveTo(0, py(i)); ctx.lineTo(W, py(i)); ctx.stroke();
+  }
+  ctx.strokeStyle = "#cbd5e1"; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(px(0), 0); ctx.lineTo(px(0), H); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0, py(0)); ctx.lineTo(W, py(0)); ctx.stroke();
+  const steps = W;
+  ctx.strokeStyle = "#6366f1"; ctx.lineWidth = 2;
+  ctx.beginPath();
+  let started = false;
+  for (let i = 0; i <= steps; i++) {
+    const x = xmin + (xmax - xmin) * i / steps;
+    try {
+      const y = Function("x", `return (${fx})`)(x);
+      if (typeof y !== 'number' || !isFinite(y) || y < ymin || y > ymax) { started = false; continue; }
+      if (!started) { ctx.moveTo(px(x), py(y)); started = true; } else ctx.lineTo(px(x), py(y));
+    } catch(e) { started = false; }
+  }
+  ctx.stroke();
+  ctx.fillStyle = "#1a1a2e"; ctx.font = "12px monospace"; ctx.textAlign = "center";
+  ctx.fillText(`f(x) = ${fx}`, W/2, 20);
+  ctx.fillStyle = "#6b7280"; ctx.font = "10px monospace";
+  ctx.textAlign = "center"; ctx.fillText(`X: [${xmin}, ${xmax}]  Y: [${ymin}, ${ymax}]`, W/2, H-8);
+}
+
+/* Calculus */
+function calcDeriv() {
+  const fx = $("calc-deriv-fx")?.value;
+  const x = parseFloat($("calc-deriv-x")?.value);
+  if (!fx || isNaN(x)) return;
+  const h = 1e-8;
+  try {
+    const f = (v) => Function("x", `return (${fx})`)(v);
+    const d = (f(x + h) - f(x - h)) / (2 * h);
+    $("calc-deriv-result").textContent = isFinite(d) ? d.toFixed(6) : "∞ / no definido";
+  } catch(e) { $("calc-deriv-result").textContent = "Error"; }
+}
+function calcInt() {
+  const fx = $("calc-int-fx")?.value;
+  const a = parseFloat($("calc-int-a")?.value), b = parseFloat($("calc-int-b")?.value);
+  if (!fx || isNaN(a) || isNaN(b)) return;
+  const n = 1000; const h = (b - a) / n;
+  try {
+    const f = (v) => Function("x", `return (${fx})`)(v);
+    let sum = f(a) + f(b);
+    for (let i = 1; i < n; i++) {
+      const x = a + i * h;
+      sum += i % 2 === 0 ? 2 * f(x) : 4 * f(x);
+    }
+    $("calc-int-result").textContent = (sum * h / 3).toFixed(6);
+  } catch(e) { $("calc-int-result").textContent = "Error"; }
+}
+function calcLim() {
+  const fx = $("calc-lim-fx")?.value;
+  const target = parseFloat($("calc-lim-x")?.value);
+  if (!fx || isNaN(target)) return;
+  try {
+    const f = (v) => Function("x", `return (${fx})`)(v);
+    const h = 1e-10;
+    const left = f(target - h), right = f(target + h);
+    if (isFinite(left) && isFinite(right) && Math.abs(left - right) < 1e-6) {
+      $("calc-lim-result").textContent = left.toFixed(6);
+    } else if (isFinite(left) && isFinite(right)) {
+      $("calc-lim-result").textContent = `Izq: ${left.toFixed(4)}, Der: ${right.toFixed(4)} (no existe)`;
+    } else {
+      $("calc-lim-result").textContent = "∞ / no existe";
+    }
+  } catch(e) { $("calc-lim-result").textContent = "Error"; }
+}
+function calcSum() {
+  const fx = $("calc-sum-fx")?.value;
+  const from = parseInt($("calc-sum-from")?.value), to = parseInt($("calc-sum-to")?.value);
+  if (!fx || isNaN(from) || isNaN(to)) return;
+  try {
+    const f = (v) => Function("i", `return (${fx})`)(v);
+    let sum = 0;
+    for (let i = from; i <= to; i++) sum += f(i);
+    $("calc-sum-result").textContent = sum.toFixed(4);
+  } catch(e) { $("calc-sum-result").textContent = "Error"; }
+}
+
+/* Physics */
+function physMRU() {
+  const d = parseFloat($("phys-mru-d")?.value), t = parseFloat($("phys-mru-t")?.value);
+  if (!isNaN(d) && !isNaN(t) && t !== 0) $("phys-mru-v").value = (d / t).toFixed(4);
+}
+function physMRUV() {
+  const v0 = parseFloat($("phys-mruv-v0")?.value), a = parseFloat($("phys-mruv-a")?.value), t = parseFloat($("phys-mruv-t")?.value);
+  if (!isNaN(v0) && !isNaN(a) && !isNaN(t)) {
+    $("phys-mruv-vf").value = (v0 + a * t).toFixed(4);
+    $("phys-mruv-d").value = (v0 * t + 0.5 * a * t * t).toFixed(4);
+  }
+}
+function physMRUA() {
+  const v0 = parseFloat($("phys-mrua-v0")?.value), vf = parseFloat($("phys-mrua-vf")?.value), a = parseFloat($("phys-mrua-a")?.value);
+  if (!isNaN(v0) && !isNaN(vf) && !isNaN(a) && a !== 0) {
+    $("phys-mrua-d").value = ((vf*vf - v0*v0) / (2*a)).toFixed(4);
+  }
+}
+
+/* Complex numbers */
+function compParse(s) {
+  s = s.replace(/\s/g, '').replace(/i/g, 'j');
+  const re = s.match(/^([+-]?\d*\.?\d*)/);
+  const im = s.match(/([+-]?\d*\.?\d*)j$/);
+  return {
+    r: parseFloat(re?.[1] || 0),
+    i: parseFloat(im?.[1] || 0) || (s.includes('j') && !im ? 1 : im && im[1] === '' ? 1 : im && im[1] === '-' ? -1 : 0)
+  };
+}
+function compOp(op) {
+  const z1 = compParse($("comp-z1")?.value || "0"), z2 = compParse($("comp-z2")?.value || "0");
+  let r, i;
+  switch(op) {
+    case '+': r = z1.r + z2.r; i = z1.i + z2.i; break;
+    case '-': r = z1.r - z2.r; i = z1.i - z2.i; break;
+    case '*': r = z1.r*z2.r - z1.i*z2.i; i = z1.r*z2.i + z1.i*z2.r; break;
+    case '/': const d = z2.r*z2.r + z2.i*z2.i; r = (z1.r*z2.r + z1.i*z2.i)/d; i = (z1.i*z2.r - z1.r*z2.i)/d; break;
+  }
+  const sign = i >= 0 ? '+' : '';
+  $("comp-result").innerHTML = `<div class="result-box" style="font-size:1.1rem;text-align:center">${r.toFixed(4)} ${sign}${i.toFixed(4)}i</div>`;
+}
+function compUnary(op) {
+  const z = compParse($("comp-z1")?.value || "0");
+  let val;
+  switch(op) {
+    case 'conj': val = `${z.r.toFixed(4)} ${-z.i >= 0 ? '+' : ''}${(-z.i).toFixed(4)}i`; break;
+    case 'mod': val = Math.sqrt(z.r*z.r + z.i*z.i).toFixed(6); break;
+    case 'arg': val = Math.atan2(z.i, z.r).toFixed(6) + ' rad'; break;
+  }
+  $("comp-result").innerHTML = `<div class="result-box" style="font-size:1.1rem;text-align:center">${val}</div>`;
+}
+
+/* Number bases */
+let baseUpdating = false;
+function baseConvert(fromBase) {
+  if (baseUpdating) return;
+  baseUpdating = true;
+  const ids = {2:'base-bin', 8:'base-oct', 10:'base-dec', 16:'base-hex'};
+  const val = parseInt(document.getElementById(ids[fromBase])?.value, fromBase);
+  const label = document.getElementById(ids[fromBase])?.value;
+  if (isNaN(val)) { baseUpdating = false; return; }
+  for (const [base, id] of Object.entries(ids)) {
+    const el = document.getElementById(id);
+    if (el && parseInt(base) !== fromBase) {
+      el.value = parseInt(base) === 16 ? val.toString(16).toUpperCase() : val.toString(parseInt(base));
+    }
+  }
+  $("base-result").innerHTML = `${val}<sub>10</sub> = ${val.toString(2)}<sub>2</sub> = ${val.toString(8)}<sub>8</sub> = ${val.toString(16).toUpperCase()}<sub>16</sub>`;
+  baseUpdating = false;
+}
+function baseExamples() {
+  baseUpdating = true;
+  const example = Math.floor(Math.random() * 255) + 1;
+  $("base-bin").value = example.toString(2);
+  $("base-oct").value = example.toString(8);
+  $("base-dec").value = example.toString(10);
+  $("base-hex").value = example.toString(16).toUpperCase();
+  $("base-result").innerHTML = `${example}<sub>10</sub> = ${example.toString(2)}<sub>2</sub> = ${example.toString(8)}<sub>8</sub> = ${example.toString(16).toUpperCase()}<sub>16</sub>`;
+  baseUpdating = false;
+}
+
+/* Electricity */
+function elecOhm() {
+  const v = parseFloat($("elec-v")?.value), i = parseFloat($("elec-i")?.value);
+  if (!isNaN(v) && !isNaN(i) && i !== 0) $("elec-r").value = (v / i).toFixed(4);
+}
+function elecSeries() {
+  const r1 = parseFloat($("elec-rs1")?.value), r2 = parseFloat($("elec-rs2")?.value);
+  if (!isNaN(r1) && !isNaN(r2)) $("elec-rs-total").value = (r1 + r2).toFixed(4);
+}
+function elecParalelo() {
+  const r1 = parseFloat($("elec-rp1")?.value), r2 = parseFloat($("elec-rp2")?.value);
+  if (!isNaN(r1) && !isNaN(r2) && (r1 !== 0 || r2 !== 0)) $("elec-rp-total").value = ((1/r1 + 1/r2) > 0 ? 1 / (1/r1 + 1/r2) : 0).toFixed(4);
+}
+
+/* Chemistry */
+const ATOMIC = { H:1, He:4, Li:7, Be:9, B:11, C:12, N:14, O:16, F:19, Ne:20, Na:23, Mg:24, Al:27, Si:28, P:31, S:32, Cl:35.5, K:39, Ca:40, Mn:55, Fe:56, Cu:64, Zn:65, Br:80, Ag:108, I:127, Ba:137, Pt:195, Au:197, Hg:201, Pb:207 };
+function chemMolarMass() {
+  const formula = $("chem-formula")?.value.trim();
+  if (!formula) return;
+  let mass = 0, i = 0;
+  const parts = formula.match(/([A-Z][a-z]?)(\d*)/g) || [];
+  let detail = [];
+  for (const p of parts) {
+    const el = p.match(/([A-Z][a-z]?)/)[1];
+    const cnt = parseInt(p.match(/\d+/)?.[0] || 1);
+    const am = ATOMIC[el];
+    if (am) { mass += am * cnt; detail.push(`${el}=${am}×${cnt}`); }
+    else { $("chem-result").innerHTML = `<div class="result-box error">Elemento desconocido: ${el}</div>`; return; }
+  }
+  $("chem-result").innerHTML = `<div class="result-box" style="font-size:1rem"><b>${formula}</b> = ${mass.toFixed(2)} g/mol<br><span style="font-size:.8rem;color:var(--muted)">${detail.join(', ')}</span></div>`;
+}
+function chemMoles() {
+  const m = parseFloat($("chem-mass")?.value), M = parseFloat($("chem-molar")?.value);
+  if (!isNaN(m) && !isNaN(M) && M !== 0) $("chem-moles-result").textContent = (m / M).toFixed(4) + ' mol';
+}
+
+/* Statistics */
+function calcStat() {
+  const data = $("stat-data")?.value.split(',').map(x => parseFloat(x.trim())).filter(x => !isNaN(x));
+  if (!data || data.length === 0) return;
+  const n = data.length;
+  const sum = data.reduce((a,b) => a+b, 0);
+  const mean = sum / n;
+  const sorted = [...data].sort((a,b) => a-b);
+  const median = n % 2 === 0 ? (sorted[n/2-1] + sorted[n/2]) / 2 : sorted[Math.floor(n/2)];
+  const modeMap = {}; let maxCnt = 0; let mode = [];
+  data.forEach(v => { modeMap[v] = (modeMap[v] || 0) + 1; if (modeMap[v] > maxCnt) maxCnt = modeMap[v]; });
+  if (maxCnt > 1) Object.entries(modeMap).forEach(([k,v]) => { if (v === maxCnt) mode.push(k); });
+  const variance = data.reduce((s,v) => s + (v-mean)**2, 0) / (n-1);
+  const std = Math.sqrt(variance);
+  const min = sorted[0], max = sorted[n-1];
+  const range = max - min;
+  $("stat-result").innerHTML = `
+    <div class="calc-stat-grid">
+      <div class="result-box"><small>n</small><br><strong>${n}</strong></div>
+      <div class="result-box"><small>Suma</small><br><strong>${sum.toFixed(4)}</strong></div>
+      <div class="result-box"><small>Media</small><br><strong>${mean.toFixed(4)}</strong></div>
+      <div class="result-box"><small>Mediana</small><br><strong>${median.toFixed(4)}</strong></div>
+      <div class="result-box"><small>Moda</small><br><strong>${mode.length ? mode.join(', ') : '—'}</strong></div>
+      <div class="result-box"><small>Min / Max</small><br><strong>${min} / ${max}</strong></div>
+      <div class="result-box"><small>Rango</small><br><strong>${range.toFixed(4)}</strong></div>
+      <div class="result-box"><small>Varianza</small><br><strong>${variance.toFixed(4)}</strong></div>
+      <div class="result-box"><small>Desv. Est.</small><br><strong>${std.toFixed(4)}</strong></div>
+    </div>
+  `;
+}
+
+/* Rule of 3 */
+let rule3Direct = true;
+function rule3Calc() {
+  const a = parseFloat($("rule3-a")?.value), b = parseFloat($("rule3-b")?.value), c = parseFloat($("rule3-c")?.value);
+  if (isNaN(a) || isNaN(b) || isNaN(c) || a === 0) return;
+  const x = rule3Direct ? (b * c) / a : (a * b) / c;
+  $("rule3-result").textContent = x.toFixed(4);
+}
+function rule3Inverse() {
+  rule3Direct = !rule3Direct;
+  const mode = $("rule3-mode");
+  if (mode) {
+    mode.innerHTML = rule3Direct
+      ? 'Regla de tres <b>directa</b>: X = (B·C)/A'
+      : 'Regla de tres <b>inversa</b>: X = (A·B)/C';
+  }
+  rule3Calc();
 }
 
 function md1Insert(id, ch) {

@@ -122,6 +122,21 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--p
 #qrcode { display: flex; justify-content: center; margin-top: 16px; }
 #qrcode canvas, #qrcode img { max-width: 100%; }
 
+/* Calc engine sub-tabs */
+.calc-canvas-wrap { width:100%; max-width:600px; margin:0 auto; }
+.calc-canvas-wrap canvas { width:100%; height:auto; background:white; border:1px solid var(--border); border-radius:8px; display:block; }
+.calc-phys-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+.calc-phys-grid label { font-size:.8rem; }
+.calc-phys-grid input { font-size:.85rem; padding:6px 10px; }
+.calc-elec-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.calc-elec-grid label { font-size:.8rem; }
+.calc-comp-grid { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:6px; }
+.calc-comp-grid button { font-size:.8rem; padding:8px; }
+.calc-bases-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.calc-bases-grid input { font-family:monospace; }
+.calc-stat-grid { display:flex; gap:8px; flex-wrap:wrap; }
+.calc-stat-grid .result-box { flex:1; min-width:120px; text-align:center; }
+
 /* MD1 Truth Table */
 .truth-table { width: 100%; border-collapse: collapse; font-family: monospace; font-size: .85rem; margin-top: 8px; }
 .truth-table th, .truth-table td { border: 1px solid var(--border); padding: 6px 12px; text-align: center; }

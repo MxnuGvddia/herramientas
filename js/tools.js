@@ -2,35 +2,21 @@ const TOOLS = [
   {
     id: "calculator", icon: "🧮", name: "Calculadora", desc: "Suma, resta, multiplica y divide",
     render: () => `
-      <input type="text" id="calc-expr" placeholder="Ej: 2 + 2 * 5" value="2 + 2" onkeydown="if(event.key==='Enter')calcEval()">
-      <div style="margin-top:10px">
-        <div class="calc-grid">
-          <button class="btn calc-key" onclick="calcInsert('(')">(</button>
-          <button class="btn calc-key" onclick="calcInsert(')')">)</button>
-          <button class="btn calc-key calc-op" onclick="calcClear()">C</button>
-          <button class="btn calc-key calc-op" onclick="calcBack()">⌫</button>
-          <button class="btn calc-key" onclick="calcInsert('7')">7</button>
-          <button class="btn calc-key" onclick="calcInsert('8')">8</button>
-          <button class="btn calc-key" onclick="calcInsert('9')">9</button>
-          <button class="btn calc-key calc-op" onclick="calcInsert('/')">÷</button>
-          <button class="btn calc-key" onclick="calcInsert('4')">4</button>
-          <button class="btn calc-key" onclick="calcInsert('5')">5</button>
-          <button class="btn calc-key" onclick="calcInsert('6')">6</button>
-          <button class="btn calc-key calc-op" onclick="calcInsert('*')">×</button>
-          <button class="btn calc-key" onclick="calcInsert('1')">1</button>
-          <button class="btn calc-key" onclick="calcInsert('2')">2</button>
-          <button class="btn calc-key" onclick="calcInsert('3')">3</button>
-          <button class="btn calc-key calc-op" onclick="calcInsert('-')">−</button>
-          <button class="btn calc-key" onclick="calcInsert('0')">0</button>
-          <button class="btn calc-key" onclick="calcInsert('.')">.</button>
-          <button class="btn calc-key calc-op" onclick="calcPi()">π</button>
-          <button class="btn calc-key calc-op" onclick="calcInsert('+')">+</button>
-          <button class="calc-eq" onclick="calcEval()">= Calcular</button>
-        </div>
+      <div class="tabs" style="display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap">
+        <button class="btn btn-secondary" style="flex:1;font-size:.75rem;padding:6px" onclick="calcTab('basic')">🔢 Básica</button>
+        <button class="btn btn-secondary" style="flex:1;font-size:.75rem;padding:6px" onclick="calcTab('graph')">📈 Gráficas</button>
+        <button class="btn btn-secondary" style="flex:1;font-size:.75rem;padding:6px" onclick="calcTab('calc')">∫ Cálculo</button>
+        <button class="btn btn-secondary" style="flex:1;font-size:.75rem;padding:6px" onclick="calcTab('phys')">⚡ Física</button>
+        <button class="btn btn-secondary" style="flex:1;font-size:.75rem;padding:6px" onclick="calcTab('complex')">🔮 Complejos</button>
+        <button class="btn btn-secondary" style="flex:1;font-size:.75rem;padding:6px" onclick="calcTab('bases')">💠 Bases</button>
+        <button class="btn btn-secondary" style="flex:1;font-size:.75rem;padding:6px" onclick="calcTab('elec')">🔌 Electricidad</button>
+        <button class="btn btn-secondary" style="flex:1;font-size:.75rem;padding:6px" onclick="calcTab('chem')">🧪 Química</button>
+        <button class="btn btn-secondary" style="flex:1;font-size:.75rem;padding:6px" onclick="calcTab('stat')">📊 Estadística</button>
+        <button class="btn btn-secondary" style="flex:1;font-size:.75rem;padding:6px" onclick="calcTab('rule3')">➗ Regla de 3</button>
       </div>
-      <div class="result" id="calc-result"></div>
+      <div id="calc-engine-content"></div>
     `,
-    init: () => { calcEval(); }
+    init: () => { calcTab('basic'); setTimeout(calcEval, 50); }
   },
   {
     id: "converter", icon: "📏", name: "Conversor de Unidades", desc: "Longitud, peso, temperatura, volumen",

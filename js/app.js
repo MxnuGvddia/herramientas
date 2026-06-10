@@ -970,13 +970,49 @@ function notesExport() {
   const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "nota.txt"; a.click();
 }
 
+function md5(s) {
+  function rotl(x, n) { return (x << n) | (x >>> (32 - n)); }
+  function toHex(n) { let h = ''; for (let i = 0; i < 4; i++) { h += ('0' + ((n >>> (i * 8)) & 0xFF).toString(16)).slice(-2); } return h; }
+  const K = [];
+  for (let i = 0; i < 64; i++) K[i] = Math.floor(Math.abs(Math.sin(i + 1)) * 0x100000000);
+  const S = [7,12,17,22, 5,9,14,20, 4,11,16,23, 6,10,15,21];
+  const blocks = [];
+  const bytes = [];
+  for (let i = 0; i < s.length; i++) bytes.push(s.charCodeAt(i));
+  const bitLen = bytes.length * 8;
+  bytes.push(0x80);
+  while ((bytes.length + 8) % 64 !== 0) bytes.push(0);
+  for (let i = 0; i < 8; i++) bytes.push((bitLen >>> (i * 8)) & 0xFF);
+  for (let i = 0; i < bytes.length; i += 64) {
+    const block = [];
+    for (let j = 0; j < 16; j++) {
+      block[j] = bytes[i + j*4] | (bytes[i + j*4 + 1] << 8) | (bytes[i + j*4 + 2] << 16) | (bytes[i + j*4 + 3] << 24);
+    }
+    blocks.push(block);
+  }
+  let a0 = 0x67452301, b0 = 0xefcdab89, c0 = 0x98badcfe, d0 = 0x10325476;
+  for (const M of blocks) {
+    let A = a0, B = b0, C = c0, D = d0;
+    for (let i = 0; i < 64; i++) {
+      let F, g;
+      if (i < 16) { F = (B & C) | (~B & D); g = i; }
+      else if (i < 32) { F = (D & B) | (~D & C); g = (5 * i + 1) % 16; }
+      else if (i < 48) { F = B ^ C ^ D; g = (3 * i + 5) % 16; }
+      else { F = C ^ (B | ~D); g = (7 * i) % 16; }
+      F = (F + A + K[i] + M[g]) | 0;
+      A = D; D = C; C = B; B = (B + rotl(F, S[Math.floor(i / 16) * 4 + (i % 4)])) | 0;
+    }
+    a0 = (a0 + A) | 0; b0 = (b0 + B) | 0; c0 = (c0 + C) | 0; d0 = (d0 + D) | 0;
+  }
+  return toHex(a0) + toHex(b0) + toHex(c0) + toHex(d0);
+}
+
 async function hashGen() {
   const t = $("hash-input").value;
   const enc = new TextEncoder().encode(t);
-  const md5 = await crypto.subtle.digest("MD5", enc).catch(() => null);
+  $("hash-md5").textContent = md5(t);
   const sha1 = await crypto.subtle.digest("SHA-1", enc);
   const sha256 = await crypto.subtle.digest("SHA-256", enc);
-  $("hash-md5").textContent = md5 ? [...new Uint8Array(md5)].map(b => b.toString(16).padStart(2,"0")).join("") : "no disponible";
   $("hash-sha1").textContent = [...new Uint8Array(sha1)].map(b => b.toString(16).padStart(2,"0")).join("");
   $("hash-sha256").textContent = [...new Uint8Array(sha256)].map(b => b.toString(16).padStart(2,"0")).join("");
 }
@@ -2846,4 +2882,105 @@ function makeGraphInteractive(canvasId, vp, redraw) {
     setV({ xmin: cx - mx * nsx, xmax: cx + (1 - mx) * nsx, ymin: cy - (1 - my) * nsy, ymax: cy + my * nsy });
     redraw();
   }, { passive: false });
+}
+
+/* ===== HYPERION Background ===== */
+let _bgParticles = [];
+function initBgCanvas() {
+  const canvas = document.getElementById('bg-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H;
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const palette = ['#7c3aed', '#00f3ff', '#ff0055', '#a78bfa', '#06b6d4', '#f472b6'];
+  const count = 90;
+  _bgParticles = [];
+  for (let i = 0; i < count; i++) {
+    _bgParticles.push({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: (Math.random() - 0.5) * 0.3,
+      r: Math.random() * 2.5 + 0.5,
+      color: palette[Math.floor(Math.random() * palette.length)],
+      alpha: Math.random() * 0.35 + 0.08,
+      pulse: Math.random() * Math.PI * 2
+    });
+  }
+
+  function drawBackground() {
+    ctx.clearRect(0, 0, W, H);
+    const g = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, Math.max(W, H) * 0.7);
+    g.addColorStop(0, 'rgba(30, 10, 60, 0.4)');
+    g.addColorStop(0.4, 'rgba(10, 5, 30, 0.25)');
+    g.addColorStop(0.7, 'rgba(5, 5, 15, 0.15)');
+    g.addColorStop(1, 'rgba(2, 2, 5, 0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+
+    for (const p of _bgParticles) {
+      p.pulse += 0.02;
+      const sAlpha = p.alpha * (0.6 + 0.4 * Math.sin(p.pulse));
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = sAlpha;
+      ctx.fill();
+      if (p.r > 1.5) {
+        ctx.shadowBlur = 12;
+        ctx.shadowColor = p.color;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    for (let i = 0; i < _bgParticles.length; i++) {
+      for (let j = i + 1; j < _bgParticles.length; j++) {
+        const dx = _bgParticles[i].x - _bgParticles[j].x;
+        const dy = _bgParticles[i].y - _bgParticles[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 120) {
+          ctx.beginPath();
+          ctx.moveTo(_bgParticles[i].x, _bgParticles[i].y);
+          ctx.lineTo(_bgParticles[j].x, _bgParticles[j].y);
+          ctx.strokeStyle = `rgba(124, 58, 237, ${0.04 * (1 - dist / 120)})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+  }
+
+  function update() {
+    for (const p of _bgParticles) {
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.x < -10) p.x = W + 10;
+      if (p.x > W + 10) p.x = -10;
+      if (p.y < -10) p.y = H + 10;
+      if (p.y > H + 10) p.y = -10;
+    }
+  }
+
+  function loop() {
+    update();
+    drawBackground();
+    requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+// Auto-init on load
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initBgCanvas);
+} else {
+  initBgCanvas();
 }

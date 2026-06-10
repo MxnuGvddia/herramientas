@@ -315,6 +315,7 @@ const TOOLS = [
         <button class="btn btn-secondary" style="flex:1" onclick="md1Tab('gates')">⚡ Compuertas</button>
         <button class="btn btn-secondary" style="flex:1" onclick="md1Tab('intro')">🧩 Introducción</button>
         <button class="btn btn-secondary" style="flex:1" onclick="md1Tab('laws')">📜 Leyes</button>
+        <button class="btn btn-secondary" style="flex:1" onclick="md1Tab('falacias')">⚖️ Falacias</button>
       </div>
       <div id="md1-content"></div>
     `,

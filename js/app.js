@@ -115,23 +115,29 @@ function calcTab(tab) {
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
           <input type="text" id="graph-fx" value="Math.sin(x)" style="flex:1;font-family:monospace" placeholder="f(x) = " onkeydown="if(event.key==='Enter')graphPlot()">
           <button class="btn" onclick="graphPlot()">📈 Graficar</button>
+          <span style="font-size:.7rem;color:var(--muted);align-self:center">🖱 Arrastra para mover · Rueda para zoom</span>
         </div>
-        <div style="display:flex;gap:12px;margin-bottom:8px;font-size:.8rem;flex-wrap:wrap">
-          <label>X min: <input type="number" id="graph-xmin" value="-10" style="width:70px;padding:4px" onchange="graphPlot()"></label>
-          <label>X max: <input type="number" id="graph-xmax" value="10" style="width:70px;padding:4px" onchange="graphPlot()"></label>
-          <label>Y min: <input type="number" id="graph-ymin" value="-5" style="width:70px;padding:4px" onchange="graphPlot()"></label>
-          <label>Y max: <input type="number" id="graph-ymax" value="5" style="width:70px;padding:4px" onchange="graphPlot()"></label>
-          <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="document.getElementById('graph-fx').value='Math.sin(x)';graphPlot()">sin(x)</button>
-          <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="document.getElementById('graph-fx').value='Math.cos(x)';graphPlot()">cos(x)</button>
-          <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="document.getElementById('graph-fx').value='x*x';graphPlot()">x²</button>
-          <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="document.getElementById('graph-fx').value='1/x';graphPlot()">1/x</button>
-          <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="document.getElementById('graph-fx').value='Math.tan(x)';graphPlot()">tan(x)</button>
-          <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="document.getElementById('graph-fx').value='Math.sqrt(x)';graphPlot()">√x</button>
-          <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="document.getElementById('graph-fx').value='x*x*x';graphPlot()">x³</button>
-          <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="document.getElementById('graph-fx').value='Math.exp(x)';graphPlot()">eˣ</button>
-          <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="document.getElementById('graph-fx').value='Math.log(x)';graphPlot()">ln(x)</button>
-          <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="document.getElementById('graph-fx').value='Math.abs(x)';graphPlot()">|x|</button>
-          <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="document.getElementById('graph-fx').value='Math.sin(1/x)';graphPlot()">sin(1/x)</button>
+        <div style="display:flex;gap:6px;margin-bottom:6px;font-size:.8rem;flex-wrap:wrap;align-items:center">
+          <label>X: <input type="number" id="graph-xmin" value="-10" style="width:65px;padding:2px" onchange="graphPlot()">
+          <input type="number" id="graph-xmax" value="10" style="width:65px;padding:2px" onchange="graphPlot()"></label>
+          <label>Y: <input type="number" id="graph-ymin" value="-5" style="width:65px;padding:2px" onchange="graphPlot()">
+          <input type="number" id="graph-ymax" value="5" style="width:65px;padding:2px" onchange="graphPlot()"></label>
+          <button class="btn btn-secondary" style="padding:2px 8px;font-size:.75rem" onclick="zoomGraphIn()">🔍+</button>
+          <button class="btn btn-secondary" style="padding:2px 8px;font-size:.75rem" onclick="zoomGraphOut()">🔍−</button>
+          <button class="btn btn-secondary" style="padding:2px 8px;font-size:.75rem" onclick="resetGraphView()">⟲</button>
+        </div>
+        <div style="display:flex;gap:4px;margin-bottom:6px;flex-wrap:wrap;font-size:.75rem">
+          <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('Math.sin(x)')">sin(x)</button>
+          <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('Math.cos(x)')">cos(x)</button>
+          <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('x*x')">x²</button>
+          <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('1/x')">1/x</button>
+          <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('Math.tan(x)')">tan(x)</button>
+          <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('Math.sqrt(x)')">√x</button>
+          <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('x*x*x')">x³</button>
+          <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('Math.exp(x)')">eˣ</button>
+          <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('Math.log(x)')">ln(x)</button>
+          <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('Math.abs(x)')">|x|</button>
+          <button class="btn btn-secondary" style="padding:2px 8px" onclick="setGraphFx('Math.sin(1/x)')">sin(1/x)</button>
         </div>
         <canvas id="graph-canvas" width="500" height="350"></canvas>
       </div>
@@ -448,7 +454,44 @@ function graphPlot() {
   ctx.fillStyle = "#1a1a2e"; ctx.font = "12px monospace"; ctx.textAlign = "center";
   ctx.fillText(`f(x) = ${fx}`, W/2, 20);
   ctx.fillStyle = "#6b7280"; ctx.font = "10px monospace";
-  ctx.textAlign = "center"; ctx.fillText(`X: [${xmin}, ${xmax}]  Y: [${ymin}, ${ymax}]`, W/2, H-8);
+  ctx.textAlign = "center"; ctx.fillText(`X: [${xmin.toFixed(2)}, ${xmax.toFixed(2)}]  Y: [${ymin.toFixed(2)}, ${ymax.toFixed(2)}]`, W/2, H-8);
+  if (!canvas._graphInited) {
+    canvas._graphInited = true;
+    makeGraphInteractive('graph-canvas', {
+      xmin: () => { const e = $("graph-xmin"); return e ? e.value : -10; },
+      xmax: () => { const e = $("graph-xmax"); return e ? e.value : 10; },
+      ymin: () => { const e = $("graph-ymin"); return e ? e.value : -5; },
+      ymax: () => { const e = $("graph-ymax"); return e ? e.value : 5; },
+      xmin_set: (v) => { const e = $("graph-xmin"); if (e) e.value = v.toFixed(4); },
+      xmax_set: (v) => { const e = $("graph-xmax"); if (e) e.value = v.toFixed(4); },
+      ymin_set: (v) => { const e = $("graph-ymin"); if (e) e.value = v.toFixed(4); },
+      ymax_set: (v) => { const e = $("graph-ymax"); if (e) e.value = v.toFixed(4); },
+    }, graphPlot);
+  }
+}
+function setGraphFx(fx) { $("graph-fx").value = fx; graphPlot(); }
+function zoomGraphIn() {
+  const xmin = parseFloat($("graph-xmin").value), xmax = parseFloat($("graph-xmax").value);
+  const ymin = parseFloat($("graph-ymin").value), ymax = parseFloat($("graph-ymax").value);
+  const cx = (xmin + xmax) / 2, cy = (ymin + ymax) / 2;
+  const sx = (xmax - xmin) * 0.85 / 2, sy = (ymax - ymin) * 0.85 / 2;
+  $("graph-xmin").value = (cx - sx).toFixed(4); $("graph-xmax").value = (cx + sx).toFixed(4);
+  $("graph-ymin").value = (cy - sy).toFixed(4); $("graph-ymax").value = (cy + sy).toFixed(4);
+  graphPlot();
+}
+function zoomGraphOut() {
+  const xmin = parseFloat($("graph-xmin").value), xmax = parseFloat($("graph-xmax").value);
+  const ymin = parseFloat($("graph-ymin").value), ymax = parseFloat($("graph-ymax").value);
+  const cx = (xmin + xmax) / 2, cy = (ymin + ymax) / 2;
+  const sx = (xmax - xmin) * 1.15 / 2, sy = (ymax - ymin) * 1.15 / 2;
+  $("graph-xmin").value = (cx - sx).toFixed(4); $("graph-xmax").value = (cx + sx).toFixed(4);
+  $("graph-ymin").value = (cy - sy).toFixed(4); $("graph-ymax").value = (cy + sy).toFixed(4);
+  graphPlot();
+}
+function resetGraphView() {
+  $("graph-xmin").value = "-10"; $("graph-xmax").value = "10";
+  $("graph-ymin").value = "-5"; $("graph-ymax").value = "5";
+  graphPlot();
 }
 
 /* Calculus */
@@ -1212,19 +1255,44 @@ function md1Tab(tab) {
   `;
   else if (tab === 'sets') c.innerHTML = `
     <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
-    <p style="margin-bottom:8px">Operaciones entre dos conjuntos. Ingresa elementos separados por coma.</p>
+    <p style="margin-bottom:8px">Operaciones con conjuntos. Ingresa elementos separados por coma.</p>
     <div class="split">
       <div><label>Conjunto A</label><input type="text" id="md1-sa" value="1,2,3,4,5" placeholder="1,2,3,4,5"></div>
       <div><label>Conjunto B</label><input type="text" id="md1-sb" value="4,5,6,7" placeholder="4,5,6,7"></div>
+      <div><label>Conjunto C</label><input type="text" id="md1-sc" value="6,7,8,9" placeholder="6,7,8,9"></div>
     </div>
+    <p style="font-size:.8rem;font-weight:600;margin:8px 0 4px;color:var(--muted)">Operaciones 2 conjuntos</p>
     <div class="btn-group">
-      <button class="btn" onclick="md1SetOp('∪')">A ∪ B (Unión)</button>
-      <button class="btn" onclick="md1SetOp('∩')">A ∩ B (Intersección)</button>
-      <button class="btn btn-secondary" onclick="md1SetOp('-')">A − B (Diferencia)</button>
-      <button class="btn btn-secondary" onclick="md1SetOp('Δ')">A Δ B (Simétrica)</button>
-      <button class="btn btn-secondary" onclick="md1SetOp('compl')">A<sup>c</sup> (Complemento)</button>
+      <button class="btn" onclick="md1SetOp('∪',2)">A ∪ B</button>
+      <button class="btn" onclick="md1SetOp('∩',2)">A ∩ B</button>
+      <button class="btn btn-secondary" onclick="md1SetOp('-',2)">A − B</button>
+      <button class="btn btn-secondary" onclick="md1SetOp('Δ',2)">A Δ B</button>
+      <button class="btn btn-secondary" onclick="md1SetOp('compl',2)">A<sup>c</sup></button>
+    </div>
+    <p style="font-size:.8rem;font-weight:600;margin:8px 0 4px;color:var(--muted)">Operaciones 3 conjuntos</p>
+    <div class="btn-group">
+      <button class="btn" onclick="md1SetOp('∪',3)">A ∪ B ∪ C</button>
+      <button class="btn" onclick="md1SetOp('∩',3)">A ∩ B ∩ C</button>
+      <button class="btn btn-secondary" onclick="md1SetOp('a∪b∩c',3)">(A ∪ B) ∩ C</button>
+      <button class="btn btn-secondary" onclick="md1SetOp('a∩b∪c',3)">(A ∩ B) ∪ C</button>
+      <button class="btn btn-secondary" onclick="md1SetOp('a−b∪c',3)">A − (B ∪ C)</button>
     </div>
     <div id="md1-sets-result" style="margin-top:12px"></div>
+    <hr style="margin:16px 0;border-color:var(--border)">
+    <h3 style="font-size:.9rem;margin-bottom:8px">📦 Particiones</h3>
+    <p style="font-size:.8rem;margin-bottom:8px">Una <b>partición</b> de un conjunto S es una colección de subconjuntos <b>no vacíos</b>, <b>disjuntos</b> y cuya <b>unión</b> es S.</p>
+    <div style="font-size:.8rem;margin-bottom:8px;padding:8px;background:var(--bg-card);border-radius:6px;border:1px solid var(--border)">
+      <b>Reglas de partición:</b><br>
+      &nbsp;1. P<sub>i</sub> ≠ ∅ — cada parte es <b>no vacía</b><br>
+      &nbsp;2. P<sub>i</sub> ∩ P<sub>j</sub> = ∅ — las partes son <b>disjuntas</b> entre sí<br>
+      &nbsp;3. ⋃ P<sub>i</sub> = S — la unión de todas las partes <b>cubre</b> todo S
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;align-items:center">
+      <label style="font-size:.8rem">Conjunto S:</label>
+      <input type="text" id="md1-pset" value="a,b,c" style="flex:1;max-width:200px;padding:4px" placeholder="a,b,c,d">
+      <button class="btn" onclick="md1ShowPartitions()" style="font-size:.8rem">🔍 Generar Particiones</button>
+    </div>
+    <div id="md1-partition-result"></div>
     <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
   `;
   else if (tab === 'bool') c.innerHTML = `
@@ -1479,6 +1547,53 @@ function md1Tab(tab) {
     </div>
     <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
   `;
+  else if (tab === 'falacias') c.innerHTML = `
+    <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
+    <p style="margin-bottom:8px"><b>⚖️ Falacias Lógicas y Argumentos</b></p>
+    <div style="font-size:.85rem;line-height:1.7">
+      <div class="result-box" style="margin-bottom:10px">
+        <h3>📖 ¿Qué es un argumento?</h3>
+        <p style="font-weight:400">Un <b>argumento</b> es un conjunto de <b>premisas</b> que pretenden apoyar una <b>conclusión</b>.<br>
+        • <b>Válido</b>: si las premisas son verdaderas, la conclusión <i>debe</i> ser verdadera.<br>
+        • <b>Sólido</b>: es válido <i>y</i> todas las premisas son verdaderas.<br>
+        • <b>Falacia</b>: error en el razonamiento que hace el argumento inválido o no sólido.</p>
+      </div>
+      <div class="result-box" style="margin-bottom:10px">
+        <h3>⚠️ Falacias Formales (error en la estructura lógica)</h3>
+        <table class="truth-table" style="font-size:.8rem">
+          <tr><th>Falacia</th><th>Descripción</th><th>Ejemplo</th></tr>
+          <tr><td><b>Afirmación del consecuente</b></td><td>p→q, q ∴ p</td><td>"Si llueve, el suelo se moja. El suelo está mojado, ∴ llueve"</td></tr>
+          <tr><td><b>Negación del antecedente</b></td><td>p→q, ¬p ∴ ¬q</td><td>"Si estudias, apruebas. No estudiaste, ∴ no apruebas"</td></tr>
+          <tr><td><b>Silogismo disyuntivo falaz</b></td><td>p∨q, p ∴ ¬q</td><td>"Es café o té. Es café, ∴ no es té" (podría ser ambos)</td></tr>
+          <tr><td><b>Petición de principio</b></td><td>La conclusión está implícita en las premisas</td><td>"Dios existe porque la Biblia lo dice, y la Biblia es la palabra de Dios"</td></tr>
+        </table>
+      </div>
+      <div class="result-box" style="margin-bottom:10px">
+        <h3>⚠️ Falacias Informales (error en el contenido)</h3>
+        <table class="truth-table" style="font-size:.8rem">
+          <tr><th>Falacia</th><th>Descripción</th></tr>
+          <tr><td><b>Ad Hominem</b></td><td>Atacar a la persona en lugar de al argumento</td></tr>
+          <tr><td><b>Hombre de Paja</b></td><td>Distorsionar el argumento del oponente para refutarlo fácilmente</td></tr>
+          <tr><td><b>Falsa Dicotomía</b></td><td>Presentar solo dos opciones cuando hay más</td></tr>
+          <tr><td><b>Apelación a la Autoridad</b></td><td>Usar una autoridad no calificada como prueba</td></tr>
+          <tr><td><b>Pendiente Resbaladiza</b></td><td>Afirmar que un paso pequeño lleva inevitablemente a una cadena de eventos extremos</td></tr>
+          <tr><td><b>Apelación a la Emoción</b></td><td>Manipular emociones en lugar de dar evidencia lógica</td></tr>
+          <tr><td><b>Generalización Apresurada</b></td><td>Conclusión basada en evidencia insuficiente</td></tr>
+          <tr><td><b>Post Hoc Ergo Propter Hoc</b></td><td>"Después de esto, ∴ a causa de esto" — confundir correlación con causalidad</td></tr>
+          <tr><td><b>Tu Quoque</b></td><td>"Tú también" — desviar la crítica señalando hipocresía</td></tr>
+          <tr><td><b>Circular (Círculo vicioso)</b></td><td>La conclusión es igual a una de las premisas</td></tr>
+        </table>
+      </div>
+    </div>
+    <hr style="margin:12px 0;border-color:var(--border)">
+    <p style="font-size:.85rem;font-weight:600;margin-bottom:6px">🎯 Identificador de Falacias</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+      <input type="text" id="md1-falacia-input" value="Si es inteligente, entonces resuelve el problema. No lo resuelve, así que no es inteligente." style="flex:1;padding:4px;font-size:.8rem">
+      <button class="btn" onclick="md1DetectFalacia()" style="font-size:.8rem">🔍 Analizar</button>
+    </div>
+    <div id="md1-falacia-result" class="result-box" style="font-size:.85rem;min-height:20px"></div>
+    <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
+  `;
 }
 
 function boolTokenize(s) {
@@ -1588,26 +1703,33 @@ function md1EvalProp() {
   `;
 }
 
-function md1SetOp(op) {
+function md1SetOp(op, n=2) {
   const a = $("md1-sa").value.split(',').map(x => x.trim()).filter(Boolean);
   const b = $("md1-sb").value.split(',').map(x => x.trim()).filter(Boolean);
-  const setA = new Set(a), setB = new Set(b);
+  const c = $("md1-sc").value.split(',').map(x => x.trim()).filter(Boolean);
+  const setA = new Set(a), setB = new Set(b), setC = new Set(c);
   let result, label;
-  if (op === '∪') { result = new Set([...setA, ...setB]); label = 'A ∪ B'; }
-  else if (op === '∩') { result = new Set([...setA].filter(x => setB.has(x))); label = 'A ∩ B'; }
-  else if (op === '-') { result = new Set([...setA].filter(x => !setB.has(x))); label = 'A − B'; }
-  else if (op === 'Δ') { result = new Set([...setA].filter(x => !setB.has(x)).concat([...setB].filter(x => !setA.has(x)))); label = 'A Δ B'; }
-  else if (op === 'compl') { result = new Set([...setA].filter(x => !setB.has(x))); label = 'A<sup>c</sup> (relativo a B)'; }
-  const arr = [...result].sort((a,b) => isNaN(a)||isNaN(b) ? String(a).localeCompare(b) : a-b);
-  $("md1-sets-result").innerHTML = `
-    <div class="split">
-      <div class="result-box"><b>A</b> = {${[...setA].join(', ')}} &nbsp; |A| = ${setA.size}</div>
-      <div class="result-box"><b>B</b> = {${[...setB].join(', ')}} &nbsp; |B| = ${setB.size}</div>
-    </div>
-    <div class="result-box" style="font-size:1.1rem;margin-top:8px">
-      <b>${label}</b> = {${arr.join(', ')}} &nbsp; |${label.replace(/<sup>c<\/sup>/,'')}| = ${arr.length}
-    </div>
-  `;
+  if (n === 2) {
+    if (op === '∪') { result = new Set([...setA, ...setB]); label = 'A ∪ B'; }
+    else if (op === '∩') { result = new Set([...setA].filter(x => setB.has(x))); label = 'A ∩ B'; }
+    else if (op === '-') { result = new Set([...setA].filter(x => !setB.has(x))); label = 'A − B'; }
+    else if (op === 'Δ') { result = new Set([...setA].filter(x => !setB.has(x)).concat([...setB].filter(x => !setA.has(x)))); label = 'A Δ B'; }
+    else if (op === 'compl') { result = new Set(a.filter(x => !setB.has(x))); label = 'A<sup>c</sup>'; }
+  } else {
+    if (op === '∪') { result = new Set([...setA, ...setB, ...setC]); label = 'A ∪ B ∪ C'; }
+    else if (op === '∩') { result = new Set([...setA].filter(x => setB.has(x) && setC.has(x))); label = 'A ∩ B ∩ C'; }
+    else if (op === 'a∪b∩c') { result = new Set([...new Set([...setA, ...setB])].filter(x => setC.has(x))); label = '(A ∪ B) ∩ C'; }
+    else if (op === 'a∩b∪c') { result = new Set([...new Set([...setA].filter(x => setB.has(x))), ...setC]); label = '(A ∩ B) ∪ C'; }
+    else if (op === 'a−b∪c') { result = new Set([...setA].filter(x => !setB.has(x) && !setC.has(x))); label = 'A − (B ∪ C)'; }
+  }
+  const arr = result ? [...result].sort((a,b) => isNaN(a)||isNaN(b) ? String(a).localeCompare(b) : a-b) : [];
+  let html = '<div class="split">';
+  html += `<div class="result-box"><b>A</b> = {${[...setA].join(', ')}} &nbsp; |A| = ${setA.size}</div>`;
+  html += `<div class="result-box"><b>B</b> = {${[...setB].join(', ')}} &nbsp; |B| = ${setB.size}</div>`;
+  if (n === 3) html += `<div class="result-box"><b>C</b> = {${[...setC].join(', ')}} &nbsp; |C| = ${setC.size}</div>`;
+  html += '</div>';
+  html += `<div class="result-box" style="font-size:1.1rem;margin-top:8px"><b>${label}</b> = {${arr.join(', ')}} &nbsp; |${label.replace(/<sup>c<\/sup>/,'')}| = ${arr.length}</div>`;
+  $("md1-sets-result").innerHTML = html;
 }
 
 function md1DirectProof() {
@@ -1685,6 +1807,89 @@ function md1ShowRules() {
   md1Tab('laws');
 }
 
+/* ===== Particiones / Bell Numbers ===== */
+function md1ShowPartitions() {
+  const s = $("md1-pset")?.value.split(',').map(x => x.trim()).filter(Boolean);
+  if (!s || s.length === 0) { $("md1-partition-result").innerHTML = '<div class="result-box error">Ingresa elementos válidos</div>'; return; }
+  if (s.length > 5) { $("md1-partition-result").innerHTML = '<div class="result-box error">Máximo 5 elementos por rendimiento</div>'; return; }
+  const n = s.length;
+  const allParts = [];
+  function generatePartitions(elems) {
+    if (elems.length === 0) return [[]];
+    const [first, ...rest] = elems;
+    const partitions = [];
+    for (const sub of generatePartitions(rest)) {
+      partitions.push([[first], ...sub]);
+      for (let i = 0; i < sub.length; i++) {
+        const copy = sub.map(b => [...b]);
+        copy[i] = [first, ...copy[i]];
+        partitions.push(copy);
+      }
+    }
+    return partitions;
+  }
+  const partitions = generatePartitions(s);
+  const bell = [1,1,2,5,15,52,203,877,4140,21147];
+  let html = `<div style="font-size:.8rem;margin-bottom:8px">`;
+  html += `<b>Número de Bell</b> B(${n}) = <b style="color:#6366f1">${bell[n]}</b> &nbsp; (total de particiones de un conjunto de ${s.length} elementos)<br>`;
+  html += `Elementos: {${s.join(', ')}}</div>`;
+  html += `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px;font-size:.75rem">`;
+  for (let i = 0; i < partitions.length; i++) {
+    const block = partitions[i].map(part => `{${part.join(',')}}`).join(' ');
+    html += `<div style="padding:4px 8px;background:var(--bg-card);border-radius:4px;border:1px solid var(--border)">${block}</div>`;
+  }
+  html += `</div>`;
+  $("md1-partition-result").innerHTML = html;
+}
+
+/* ===== Falacias ===== */
+function md1DetectFalacia() {
+  const text = $("md1-falacia-input")?.value.trim();
+  if (!text) return;
+  const lower = text.toLowerCase();
+  const patterns = [
+    { name: 'Afirmación del consecuente', desc: '"Si P entonces Q, Q ∴ P" — la conclusión no se sigue lógicamente.',
+      pattern: /si.*entonces.*,\s*.+,\s*(?:así que|entonces|por lo tanto|∴)\s*(?!no)/i },
+    { name: 'Negación del antecedente', desc: '"Si P entonces Q, no P ∴ no Q" — la conclusión no se sigue lógicamente.',
+      pattern: /si.*entonces.*,?\s*(?:no|¬)\s*.*,\s*(?:así que|entonces|por lo tanto|∴)\s*(?:no|¬)/i },
+    { name: 'Generalización apresurada', desc: 'Conclusión general basada en muy pocos casos particulares.',
+      pattern: /(?:todos?|siempre|nunca|nadie|todo el mundo).*(?:porque|ya que|basado en|vi).*(?:un|una|uno?|algunos?|pocos)/i },
+    { name: 'Falsa dicotomía', desc: 'Presenta solo dos opciones cuando existen más alternativas.',
+      pattern: /(?:o|or).*(?:o|or)\s+(?:no hay más|sin más|solamente|únicamente|forzosamente|necesariamente)/i },
+    { name: 'Pendiente resbaladiza', desc: 'Asume que un primer paso inevitablemente lleva a una cadena de eventos extremos.',
+      pattern: /(?:llevará?|conducirá?|terminará?|acabará?|desembocará?).*(?:catástrofe|desastre|caos|ruina|destrucción|apocalipsis)/i },
+    { name: 'Ad Hominem', desc: 'Ataca a la persona en lugar de refutar su argumento.',
+      pattern: /(?:eres (?:un|una) |tú (?:solo|siempre) |no entiendes|ignorante|estúpido|idiota|no sabes de lo que hablas)/i },
+    { name: 'Apelación a la autoridad', desc: 'Usa una autoridad no calificada como evidencia.',
+      pattern: /(?:experto|autoridad|doctor|profesor|científico dice|especialista afirma|según).*(?:por lo tanto|así que|entonces|∴|por eso)/i },
+    { name: 'Post Hoc', desc: 'Confunde correlación con causalidad — "después de esto, por lo tanto a causa de esto".',
+      pattern: /(?:después de|tras|desde que|luego de).*,?\s*(?:por lo tanto|entonces|así que|∴)\s*/i },
+    { name: 'Petición de principio (circular)', desc: 'La conclusión está implícita en las premisas — argumento circular.',
+      pattern: /(?:porque|ya que).*\1/i },
+    { name: 'Apelación a la emoción', desc: 'Manipula emociones (miedo, lástima, orgullo) en lugar de dar evidencia.',
+      pattern: /(?:piensa en los niños|imagina el sufrimiento|qué pasaría si|ten compasión|por el bien de|por amor a|ten piedad)/i },
+  ];
+  let found = [];
+  for (const f of patterns) {
+    if (f.pattern.test(text)) { found.push(f); }
+  }
+  if (found.length > 0) {
+    let html = `<div style="margin-bottom:6px">⚠️ Posible(s) falacia(s) detectada(s):</div>`;
+    for (const f of found) {
+      html += `<div style="padding:6px 10px;margin-bottom:6px;background:#fef3c7;border-radius:6px;border-left:4px solid #f59e0b">
+        <b style="color:#92400e">${f.name}</b><br><span style="color:#6b7280;font-size:.8rem">${f.desc}</span>
+      </div>`;
+    }
+    $("md1-falacia-result").innerHTML = html;
+  } else {
+    $("md1-falacia-result").innerHTML = `
+      <div style="padding:8px;background:#d1fae5;border-radius:6px;border-left:4px solid #10b981">
+        ✅ No se detectaron falacias comunes en el texto.<br>
+        <span style="font-size:.8rem;color:#6b7280">(Análisis básico basado en patrones — puede no detectar todas las falacias)</span>
+      </div>`;
+  }
+}
+
 /* ===== MD1 Estudio Interactivo ===== */
 function md1StudyTab(tab) {
   const c = $("md1-study-content");
@@ -1728,16 +1933,26 @@ function md1StudyTab(tab) {
     sets: `
       <p style="font-size:.9rem;margin-bottom:8px"><b>📊 Diagramas de Venn Interactivos</b></p>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;align-items:center">
-        <label style="font-size:.8rem">Elementos de A: <input type="text" id="venn-elems-a" value="1,2,3,4" style="width:120px;padding:4px" oninput="md1StudySetsVenn()"></label>
-        <label style="font-size:.8rem">Elementos de B: <input type="text" id="venn-elems-b" value="3,4,5,6" style="width:120px;padding:4px" oninput="md1StudySetsVenn()"></label>
+        <label style="font-size:.8rem">A: <input type="text" id="venn-elems-a" value="1,2,3,4" style="width:100px;padding:4px" oninput="md1StudySetsVenn()"></label>
+        <label style="font-size:.8rem">B: <input type="text" id="venn-elems-b" value="3,4,5,6" style="width:100px;padding:4px" oninput="md1StudySetsVenn()"></label>
+        <label style="font-size:.8rem">C: <input type="text" id="venn-elems-c" value="4,5,7,8" style="width:100px;padding:4px" oninput="md1StudySetsVenn()"></label>
       </div>
-      <div class="calc-comp-grid" style="margin-bottom:8px">
-        <button class="btn btn-secondary" onclick="md1StudySetOp('∪')" style="font-size:.8rem">A ∪ B</button>
-        <button class="btn btn-secondary" onclick="md1StudySetOp('∩')" style="font-size:.8rem">A ∩ B</button>
-        <button class="btn btn-secondary" onclick="md1StudySetOp('−')" style="font-size:.8rem">A − B</button>
-        <button class="btn btn-secondary" onclick="md1StudySetOp('Δ')" style="font-size:.8rem">A Δ B</button>
+      <div style="display:flex;gap:3px;flex-wrap:wrap;margin-bottom:4px;font-size:.8rem">
+        <b style="margin-right:6px">2 conjuntos:</b>
+        <button class="btn btn-secondary" onclick="md1StudySetOp('∪',2)" style="padding:3px 8px;font-size:.75rem">A∪B</button>
+        <button class="btn btn-secondary" onclick="md1StudySetOp('∩',2)" style="padding:3px 8px;font-size:.75rem">A∩B</button>
+        <button class="btn btn-secondary" onclick="md1StudySetOp('−',2)" style="padding:3px 8px;font-size:.75rem">A−B</button>
+        <button class="btn btn-secondary" onclick="md1StudySetOp('Δ',2)" style="padding:3px 8px;font-size:.75rem">AΔB</button>
       </div>
-      <canvas id="venn-canvas" width="480" height="340"></canvas>
+      <div style="display:flex;gap:3px;flex-wrap:wrap;margin-bottom:8px;font-size:.8rem">
+        <b style="margin-right:6px">3 conjuntos:</b>
+        <button class="btn btn-secondary" onclick="md1StudySetOp('∪',3)" style="padding:3px 8px;font-size:.75rem">A∪B∪C</button>
+        <button class="btn btn-secondary" onclick="md1StudySetOp('∩',3)" style="padding:3px 8px;font-size:.75rem">A∩B∩C</button>
+        <button class="btn btn-secondary" onclick="md1StudySetOp('a∪b∩c',3)" style="padding:3px 8px;font-size:.75rem">(A∪B)∩C</button>
+        <button class="btn btn-secondary" onclick="md1StudySetOp('a∩b∪c',3)" style="padding:3px 8px;font-size:.75rem">(A∩B)∪C</button>
+        <button class="btn btn-secondary" onclick="md1StudySetOp('a−b∪c',3)" style="padding:3px 8px;font-size:.75rem">A−(B∪C)</button>
+      </div>
+      <canvas id="venn-canvas" width="480" height="360"></canvas>
       <div id="venn-result" class="result-box" style="margin-top:8px;font-size:.85rem;text-align:center"></div>
     `,
     bool: `
@@ -1780,7 +1995,7 @@ function md1StudyTab(tab) {
   if (tab === 'bool') setTimeout(md1StudyBool, 50);
 }
 
-let studySetOp = '∪';
+let studySetOp = '∪', studySetN = 2;
 
 function md1SInsert(ch) {
   const inp = document.getElementById('study-logic-expr') || document.getElementById('study-bool-expr');
@@ -1839,8 +2054,9 @@ function md1StudyLogic() {
   $("study-logic-result").innerHTML = html;
 }
 
-function md1StudySetOp(op) {
+function md1StudySetOp(op, n) {
   studySetOp = op;
+  if (n) studySetN = n;
   md1StudySetsVenn();
 }
 
@@ -1849,65 +2065,125 @@ function md1StudySetsVenn() {
   if (!canvas) return;
   const ctx = canvas.getContext("2d");
   const W = canvas.width, H = canvas.height;
-  const cx = W/2, cy = H/2 + 10, r = 110, dx = 60;
   const aStr = $("venn-elems-a")?.value || "";
   const bStr = $("venn-elems-b")?.value || "";
+  const cStr = $("venn-elems-c")?.value || "";
   const setA = new Set(aStr.split(',').map(x => x.trim()).filter(Boolean));
   const setB = new Set(bStr.split(',').map(x => x.trim()).filter(Boolean));
-  const onlyA = [...setA].filter(x => !setB.has(x));
-  const onlyB = [...setB].filter(x => !setA.has(x));
-  const both = [...setA].filter(x => setB.has(x));
+  const setC = new Set(cStr.split(',').map(x => x.trim()).filter(Boolean));
+  const onlyA = [...setA].filter(x => !setB.has(x) && !setC.has(x));
+  const onlyB = [...setB].filter(x => !setA.has(x) && !setC.has(x));
+  const onlyC = [...setC].filter(x => !setA.has(x) && !setB.has(x));
+  const abOnly = [...setA].filter(x => setB.has(x) && !setC.has(x));
+  const acOnly = [...setA].filter(x => setC.has(x) && !setB.has(x));
+  const bcOnly = [...setB].filter(x => setC.has(x) && !setA.has(x));
+  const abcAll = [...setA].filter(x => setB.has(x) && setC.has(x));
   ctx.clearRect(0, 0, W, H);
   ctx.save();
-  if (studySetOp === '∩') {
-    ctx.beginPath(); ctx.arc(cx - dx, cy, r, 0, Math.PI * 2); ctx.clip();
-    ctx.fillStyle = "rgba(139,92,246,0.6)";
-    ctx.beginPath(); ctx.arc(cx + dx, cy, r, 0, Math.PI * 2); ctx.fill();
-  } else if (studySetOp === '∪') {
-    ctx.fillStyle = "rgba(139,92,246,0.3)";
-    ctx.beginPath(); ctx.arc(cx - dx, cy, r, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(cx + dx, cy, r, 0, Math.PI * 2); ctx.fill();
-  } else if (studySetOp === '−') {
-    ctx.fillStyle = "rgba(59,130,246,0.5)";
-    ctx.beginPath(); ctx.arc(cx - dx, cy, r, 0, Math.PI * 2); ctx.fill();
+  const r = 105, dx = 70, dy = 38, dcy = 55;
+  const cx = W/2, cy = H/2 - 5;
+  const centers = [
+    {x: cx - dx, y: cy - dy},  // A
+    {x: cx + dx, y: cy - dy},  // B
+    {x: cx, y: cy + dcy}       // C
+  ];
+  const inResult = (inA, inB, inC) => {
+    if (studySetN === 2) {
+      if (studySetOp === '∪') return inA || inB;
+      if (studySetOp === '∩') return inA && inB;
+      if (studySetOp === '−') return inA && !inB;
+      if (studySetOp === 'Δ') return (inA || inB) && !(inA && inB);
+      return false;
+    } else {
+      if (studySetOp === '∪') return inA || inB || inC;
+      if (studySetOp === '∩') return inA && inB && inC;
+      if (studySetOp === 'a∪b∩c') return (inA || inB) && inC;
+      if (studySetOp === 'a∩b∪c') return (inA && inB) || inC;
+      if (studySetOp === 'a−b∪c') return inA && !inB && !inC;
+      return false;
+    }
+  };
+  const drawFilled = (maskFn) => {
+    ctx.fillStyle = "rgba(139,92,246,0.35)";
+    for (const c of centers) { ctx.beginPath(); ctx.arc(c.x, c.y, r, 0, Math.PI*2); ctx.fill(); }
     ctx.globalCompositeOperation = 'destination-out';
-    ctx.beginPath(); ctx.arc(cx + dx, cy, r, 0, Math.PI * 2); ctx.fill();
+    for (const c of centers) {
+      if (!maskFn(c === centers[0], c === centers[1], c === centers[2])) {
+        ctx.save();
+        ctx.beginPath(); ctx.arc(c.x, c.y, r, 0, Math.PI*2); ctx.clip();
+        ctx.fillStyle = "rgba(0,0,0,1)";
+        ctx.fillRect(0, 0, W, H);
+        ctx.restore();
+      }
+    }
+    ctx.globalCompositeOperation = 'source-over';
+  };
+  if (studySetOp === '∩' && studySetN === 2) {
+    ctx.beginPath(); ctx.arc(centers[0].x, centers[0].y, r, 0, Math.PI*2); ctx.clip();
+    ctx.fillStyle = "rgba(139,92,246,0.6)";
+    ctx.beginPath(); ctx.arc(centers[1].x, centers[1].y, r, 0, Math.PI*2); ctx.fill();
+  } else if (studySetOp === '∪' && studySetN === 2) {
+    ctx.fillStyle = "rgba(139,92,246,0.3)";
+    for (let i = 0; i < 2; i++) { ctx.beginPath(); ctx.arc(centers[i].x, centers[i].y, r, 0, Math.PI*2); ctx.fill(); }
+  } else if (studySetOp === '−' && studySetN === 2) {
+    ctx.fillStyle = "rgba(59,130,246,0.5)";
+    ctx.beginPath(); ctx.arc(centers[0].x, centers[0].y, r, 0, Math.PI*2); ctx.fill();
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath(); ctx.arc(centers[1].x, centers[1].y, r, 0, Math.PI*2); ctx.fill();
     ctx.globalCompositeOperation = 'source-over';
     ctx.fillStyle = "rgba(59,130,246,0.2)";
-    ctx.beginPath(); ctx.arc(cx - dx, cy, r, 0, Math.PI * 2); ctx.fill();
-  } else if (studySetOp === 'Δ') {
+    ctx.beginPath(); ctx.arc(centers[0].x, centers[0].y, r, 0, Math.PI*2); ctx.fill();
+  } else if (studySetOp === 'Δ' && studySetN === 2) {
     ctx.fillStyle = "rgba(139,92,246,0.25)";
-    ctx.beginPath(); ctx.arc(cx - dx, cy, r, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(cx + dx, cy, r, 0, Math.PI * 2); ctx.fill();
+    for (let i = 0; i < 2; i++) { ctx.beginPath(); ctx.arc(centers[i].x, centers[i].y, r, 0, Math.PI*2); ctx.fill(); }
     ctx.globalCompositeOperation = 'destination-out';
     ctx.fillStyle = "rgba(0,0,0,0.4)";
-    ctx.beginPath(); ctx.arc(cx - dx, cy, r, 0, Math.PI * 2); ctx.clip();
-    ctx.beginPath(); ctx.arc(cx + dx, cy, r, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(centers[0].x, centers[0].y, r, 0, Math.PI*2); ctx.clip();
+    ctx.beginPath(); ctx.arc(centers[1].x, centers[1].y, r, 0, Math.PI*2); ctx.fill();
+  } else if (studySetN === 3) {
+    ctx.fillStyle = "rgba(139,92,246,0.3)";
+    for (const c of centers) { ctx.beginPath(); ctx.arc(c.x, c.y, r, 0, Math.PI*2); ctx.fill(); }
   }
   ctx.restore();
-  ctx.strokeStyle = "#3b82f6"; ctx.lineWidth = 2.5;
-  ctx.beginPath(); ctx.arc(cx - dx, cy, r, 0, Math.PI * 2); ctx.stroke();
-  ctx.strokeStyle = "#ef4444";
-  ctx.beginPath(); ctx.arc(cx + dx, cy, r, 0, Math.PI * 2); ctx.stroke();
-  ctx.fillStyle = "#1e293b"; ctx.font = "bold 20px sans-serif"; ctx.textAlign = "center";
-  ctx.fillText("A", cx - dx - r/2 - 8, cy + 6);
-  ctx.fillText("B", cx + dx + r/2 + 8, cy + 6);
-  ctx.font = "12px sans-serif"; ctx.fillStyle = "#475569";
-  ctx.fillText(onlyA.join(', '), cx - dx - 5, cy - 5);
-  ctx.fillText(onlyB.join(', '), cx + dx + 5, cy - 5);
-  ctx.fillText(both.join(', '), cx, cy - 10);
+  for (const c of centers) { ctx.strokeStyle = "#3b82f6"; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.arc(c.x, c.y, r, 0, Math.PI*2); ctx.stroke(); }
+  ctx.fillStyle = "#1e293b"; ctx.font = "bold 18px sans-serif"; ctx.textAlign = "center";
+  ctx.fillText("A", centers[0].x - r/2 - 10, centers[0].y + 6);
+  ctx.fillText("B", centers[1].x + r/2 + 10, centers[1].y + 6);
+  ctx.fillText("C", centers[2].x, centers[2].y + r/2 + 18);
+  ctx.font = "11px sans-serif"; ctx.fillStyle = "#475569";
+  ctx.fillText(onlyA.join(', '), centers[0].x - r/2 - 5, centers[0].y);
+  ctx.fillText(onlyB.join(', '), centers[1].x + r/2 + 5, centers[1].y);
+  ctx.fillText(onlyC.join(', '), centers[2].x, centers[2].y + r/2 + 6);
+  ctx.fillText(abOnly.join(', '), (centers[0].x + centers[1].x)/2, centers[0].y + 5);
+  ctx.fillText(acOnly.join(', '), (centers[0].x + centers[2].x)/2, (centers[0].y + centers[2].y)/2 - 8);
+  ctx.fillText(bcOnly.join(', '), (centers[1].x + centers[2].x)/2, (centers[1].y + centers[2].y)/2 - 8);
+  ctx.fillText(abcAll.join(', '), cx, cy + 6);
   ctx.font = "13px sans-serif"; ctx.fillStyle = "#6366f1";
-  ctx.fillText(`A ${studySetOp} B`, W/2, 22);
+  ctx.fillText(studySetN === 2 ? `A ${studySetOp} B` : (
+    studySetOp === '∪' ? 'A ∪ B ∪ C' :
+    studySetOp === '∩' ? 'A ∩ B ∩ C' :
+    studySetOp === 'a∪b∩c' ? '(A ∪ B) ∩ C' :
+    studySetOp === 'a∩b∪c' ? '(A ∩ B) ∪ C' :
+    studySetOp === 'a−b∪c' ? 'A − (B ∪ C)' : ''), W/2, 16);
   let result;
-  if (studySetOp === '∪') result = new Set([...setA, ...setB]);
-  else if (studySetOp === '∩') result = new Set(both);
-  else if (studySetOp === '−') result = new Set(onlyA);
-  else if (studySetOp === 'Δ') result = new Set([...onlyA, ...onlyB]);
-  const arr = [...result].sort();
+  if (studySetN === 2) {
+    if (studySetOp === '∪') result = new Set([...setA, ...setB]);
+    else if (studySetOp === '∩') result = new Set([...setA].filter(x => setB.has(x)));
+    else if (studySetOp === '−') result = new Set(onlyA);
+    else if (studySetOp === 'Δ') result = new Set([...onlyA, ...onlyB]);
+  } else {
+    if (studySetOp === '∪') result = new Set([...setA, ...setB, ...setC]);
+    else if (studySetOp === '∩') result = new Set(abcAll);
+    else if (studySetOp === 'a∪b∩c') result = new Set([...new Set([...setA, ...setB])].filter(x => setC.has(x)));
+    else if (studySetOp === 'a∩b∪c') result = new Set([...new Set([...setA].filter(x => setB.has(x))), ...setC]);
+    else if (studySetOp === 'a−b∪c') result = new Set(onlyA);
+  }
+  const arr = result ? [...result].sort() : [];
   $("venn-result").innerHTML = `
-    <b>A</b> = {${[...setA].join(', ')}} &nbsp;|A|=${setA.size} &nbsp;&nbsp;
-    <b>B</b> = {${[...setB].join(', ')}} &nbsp;|B|=${setB.size}<br>
-    <b>A ${studySetOp} B</b> = {${arr.join(', ')}} &nbsp;|${arr.length}|
+    <b>A</b>={${[...setA].join(',')}} |A|=${setA.size} &nbsp;
+    <b>B</b>={${[...setB].join(',')}} |B|=${setB.size} &nbsp;
+    <b>C</b>={${[...setC].join(',')}} |C|=${setC.size}<br>
+    <b>${studySetN === 2 ? `A ${studySetOp} B` : studySetOp}</b> = {${arr.join(', ')}} |${arr.length}|
   `;
 }
 
@@ -1987,6 +2263,7 @@ function precalcTab(tab) {
         <input type="number" id="pfunc-xmax" value="10" style="width:50px;padding:2px" onchange="precalcFuncDraw()"></label>
         <label>Y: <input type="number" id="pfunc-ymin" value="-5" style="width:50px;padding:2px" onchange="precalcFuncDraw()">
         <input type="number" id="pfunc-ymax" value="5" style="width:50px;padding:2px" onchange="precalcFuncDraw()"></label>
+        <span style="font-size:.7rem;color:var(--muted)">🖱 Arrastra para mover · Rueda zoom</span>
       </div>
       <canvas id="pfunc-canvas" width="500" height="350"></canvas>
       <div id="pfunc-info" class="result-box" style="margin-top:8px;font-size:.8rem;text-align:center"></div>
@@ -1998,9 +2275,11 @@ function precalcTab(tab) {
         <input type="text" id="plim-fx" value="Math.sin(x)/x" style="flex:1;font-family:monospace;padding:4px" onkeydown="if(event.key==='Enter')precalcLimDraw()">
         <button class="btn" style="padding:4px 12px;font-size:.8rem" onclick="precalcLimDraw()">Graficar</button>
       </div>
-      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px;font-size:.8rem;align-items:center">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;font-size:.8rem;align-items:center">
         <label>x → <input type="number" id="plim-target" value="0" style="width:60px;padding:4px" oninput="precalcLimDraw()"></label>
-        <label>Zoom: <input type="range" id="plim-zoom" min="1" max="10" step="0.5" value="5" oninput="precalcLimDraw()" style="width:100px"></label>
+        <label>Zoom: <input type="range" id="plim-zoom" min="1" max="10" step="0.5" value="5" oninput="precalcLimDraw()" style="width:80px"></label>
+        <span style="font-size:.7rem;color:var(--muted)">🖱 Arrastra para mover · Rueda zoom</span>
+        <button class="btn btn-secondary" style="padding:2px 8px;font-size:.75rem" onclick="plimResetView()">⟲</button>
         <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="document.getElementById('plim-fx').value='(x*x-1)/(x-1)';precalcLimDraw()">(x²-1)/(x-1)</button>
         <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="document.getElementById('plim-fx').value='Math.sin(x)/x';precalcLimDraw()">sin(x)/x</button>
         <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="document.getElementById('plim-fx').value='1/x';precalcLimDraw()">1/x</button>
@@ -2015,9 +2294,11 @@ function precalcTab(tab) {
         <input type="text" id="pderiv-fx" value="x*x" style="flex:1;font-family:monospace;padding:4px" onkeydown="if(event.key==='Enter')precalcDerivDraw()">
         <button class="btn" style="padding:4px 12px;font-size:.8rem" onclick="precalcDerivDraw()">Graficar</button>
       </div>
-      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px;font-size:.8rem;align-items:center">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;font-size:.8rem;align-items:center">
         <label>x₀ = <input type="range" id="pderiv-x" min="-8" max="8" step="0.1" value="1" oninput="precalcDerivDraw()" style="width:150px">
         <span id="pderiv-xval" style="font-weight:600;min-width:30px">1</span></label>
+        <span style="font-size:.7rem;color:var(--muted)">🖱 Arrastra para mover · Rueda zoom</span>
+        <button class="btn btn-secondary" style="padding:2px 8px;font-size:.75rem" onclick="pderivResetView()">⟲</button>
         <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="document.getElementById('pderiv-fx').value='x*x';precalcDerivDraw()">x²</button>
         <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="document.getElementById('pderiv-fx').value='Math.sin(x)';precalcDerivDraw()">sin(x)</button>
         <button class="btn btn-secondary" style="padding:4px 10px;font-size:.75rem" onclick="document.getElementById('pderiv-fx').value='x*x*x';precalcDerivDraw()">x³</button>
@@ -2033,16 +2314,18 @@ function precalcTab(tab) {
         <input type="text" id="pint-fx" value="x*x" style="flex:1;font-family:monospace;padding:4px" onkeydown="if(event.key==='Enter')precalcIntDraw()">
         <button class="btn" style="padding:4px 12px;font-size:.8rem" onclick="precalcIntDraw()">Graficar</button>
       </div>
-      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px;font-size:.8rem;align-items:center">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;font-size:.8rem;align-items:center">
         <label>a = <input type="number" id="pint-a" value="0" style="width:50px;padding:4px" oninput="precalcIntDraw()"></label>
         <label>b = <input type="number" id="pint-b" value="2" style="width:50px;padding:4px" oninput="precalcIntDraw()"></label>
-        <label>Rectángulos: <input type="range" id="pint-n" min="2" max="50" step="1" value="8" oninput="precalcIntDraw()" style="width:120px">
+        <label>Rectángulos: <input type="range" id="pint-n" min="2" max="50" step="1" value="8" oninput="precalcIntDraw()" style="width:100px">
         <span id="pint-nval" style="font-weight:600;min-width:20px">8</span></label>
         <select id="pint-type" onchange="precalcIntDraw()" style="padding:4px;font-size:.75rem">
           <option value="left">Izquierda</option>
           <option value="mid" selected>Punto medio</option>
           <option value="right">Derecha</option>
         </select>
+        <span style="font-size:.7rem;color:var(--muted)">🖱 Arrastra para mover · Rueda zoom</span>
+        <button class="btn btn-secondary" style="padding:2px 8px;font-size:.75rem" onclick="pintResetView()">⟲</button>
       </div>
       <canvas id="pint-canvas" width="500" height="350"></canvas>
       <div id="pint-info" class="result-box" style="margin-top:8px;font-size:.85rem;text-align:center"></div>
@@ -2149,6 +2432,19 @@ function precalcFuncDraw() {
     }
     infoEl.innerHTML = info;
   }
+  if (!canvas._pfuncInited) {
+    canvas._pfuncInited = true;
+    makeGraphInteractive('pfunc-canvas', {
+      xmin: () => $("pfunc-xmin")?.value || -10,
+      xmax: () => $("pfunc-xmax")?.value || 10,
+      ymin: () => $("pfunc-ymin")?.value || -5,
+      ymax: () => $("pfunc-ymax")?.value || 5,
+      xmin_set: v => { const e = $("pfunc-xmin"); if (e) e.value = v.toFixed(4); },
+      xmax_set: v => { const e = $("pfunc-xmax"); if (e) e.value = v.toFixed(4); },
+      ymin_set: v => { const e = $("pfunc-ymin"); if (e) e.value = v.toFixed(4); },
+      ymax_set: v => { const e = $("pfunc-ymax"); if (e) e.value = v.toFixed(4); },
+    }, precalcFuncDraw);
+  }
 }
 
 function precalcLimDraw() {
@@ -2159,17 +2455,23 @@ function precalcLimDraw() {
   const fx = $("plim-fx")?.value.trim() || "Math.sin(x)/x";
   const target = parseFloat($("plim-target")?.value || 0);
   const zoom = parseFloat($("plim-zoom")?.value || 5);
-  const range = zoom;
-  const xmin = target - range, xmax = target + range;
-  const ymin = -range * 0.7, ymax = range * 0.7;
+  if (!canvas._vpInited) {
+    canvas._vpInited = false;
+    canvas._vp = {};
+  }
+  if (!canvas._vpInited || !canvas._vp.custom) {
+    const range = zoom;
+    canvas._vp = { xmin: target - range, xmax: target + range, ymin: -range * 0.7, ymax: range * 0.7, custom: false };
+  }
+  const { xmin, xmax, ymin, ymax } = canvas._vp;
   ctx.clearRect(0, 0, W, H);
   const px = x => (x - xmin) / (xmax - xmin) * W;
   const py = y => H - (y - ymin) / (ymax - ymin) * H;
   ctx.strokeStyle = "#e2e8f0"; ctx.lineWidth = 0.5;
-  for (let i = -20; i <= 20; i++) { if (i === 0) continue;
-    ctx.beginPath(); ctx.moveTo(px(target + i*range/5), 0); ctx.lineTo(px(target + i*range/5), H); ctx.stroke(); }
-  for (let i = -20; i <= 20; i++) { if (i === 0) continue;
-    ctx.beginPath(); ctx.moveTo(0, py(i*range/5*0.7)); ctx.lineTo(W, py(i*range/5*0.7)); ctx.stroke(); }
+  for (let i = Math.ceil(xmin); i <= Math.floor(xmax); i++) { if (i === 0) continue;
+    ctx.beginPath(); ctx.moveTo(px(i), 0); ctx.lineTo(px(i), H); ctx.stroke(); }
+  for (let i = Math.ceil(ymin); i <= Math.floor(ymax); i++) { if (i === 0) continue;
+    ctx.beginPath(); ctx.moveTo(0, py(i)); ctx.lineTo(W, py(i)); ctx.stroke(); }
   ctx.strokeStyle = "#94a3b8"; ctx.lineWidth = 1.5;
   ctx.beginPath(); ctx.moveTo(px(target), 0); ctx.lineTo(px(target), H); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(0, py(0)); ctx.lineTo(W, py(0)); ctx.stroke();
@@ -2220,6 +2522,26 @@ function precalcLimDraw() {
     }
     infoEl.innerHTML = info;
   }
+  if (!canvas._graphInited) {
+    canvas._graphInited = true;
+    canvas._vpInited = true;
+    canvas._vp.custom = true;
+    makeGraphInteractive('plim-canvas', {
+      xmin: () => { const c = $("plim-canvas"); return c ? (c._vp?.xmin ?? -5) : -5; },
+      xmax: () => { const c = $("plim-canvas"); return c ? (c._vp?.xmax ?? 5) : 5; },
+      ymin: () => { const c = $("plim-canvas"); return c ? (c._vp?.ymin ?? -3.5) : -3.5; },
+      ymax: () => { const c = $("plim-canvas"); return c ? (c._vp?.ymax ?? 3.5) : 3.5; },
+      xmin_set: v => { const c = $("plim-canvas"); if (c) { c._vp.xmin = v; c._vp.custom = true; } },
+      xmax_set: v => { const c = $("plim-canvas"); if (c) { c._vp.xmax = v; c._vp.custom = true; } },
+      ymin_set: v => { const c = $("plim-canvas"); if (c) { c._vp.ymin = v; c._vp.custom = true; } },
+      ymax_set: v => { const c = $("plim-canvas"); if (c) { c._vp.ymax = v; c._vp.custom = true; } },
+    }, precalcLimDraw);
+  }
+}
+function plimResetView() {
+  const canvas = $("plim-canvas");
+  if (canvas) { canvas._vpInited = false; canvas._vp = {}; }
+  precalcLimDraw();
 }
 
 function precalcDerivDraw() {
@@ -2229,7 +2551,8 @@ function precalcDerivDraw() {
   const W = canvas.width, H = canvas.height;
   const fx = $("pderiv-fx")?.value.trim() || "x*x";
   const x0 = parseFloat($("pderiv-x")?.value || 1);
-  const xmin = -10, xmax = 10, ymin = -5, ymax = 5;
+  if (!canvas._vp) canvas._vp = { xmin: -10, xmax: 10, ymin: -5, ymax: 5 };
+  const { xmin, xmax, ymin, ymax } = canvas._vp;
   $("pderiv-xval").textContent = x0.toFixed(1);
   ctx.clearRect(0, 0, W, H);
   const px = x => (x - xmin) / (xmax - xmin) * W;
@@ -2293,6 +2616,24 @@ function precalcDerivDraw() {
       infoEl.innerHTML = '<span style="color:#dc2626">La función no es derivable en este punto</span>';
     }
   }
+  if (!canvas._graphInited) {
+    canvas._graphInited = true;
+    makeGraphInteractive('pderiv-canvas', {
+      xmin: () => { const c = $("pderiv-canvas"); return c?._vp?.xmin ?? -10; },
+      xmax: () => { const c = $("pderiv-canvas"); return c?._vp?.xmax ?? 10; },
+      ymin: () => { const c = $("pderiv-canvas"); return c?._vp?.ymin ?? -5; },
+      ymax: () => { const c = $("pderiv-canvas"); return c?._vp?.ymax ?? 5; },
+      xmin_set: v => { const c = $("pderiv-canvas"); if (c) c._vp.xmin = v; },
+      xmax_set: v => { const c = $("pderiv-canvas"); if (c) c._vp.xmax = v; },
+      ymin_set: v => { const c = $("pderiv-canvas"); if (c) c._vp.ymin = v; },
+      ymax_set: v => { const c = $("pderiv-canvas"); if (c) c._vp.ymax = v; },
+    }, precalcDerivDraw);
+  }
+}
+function pderivResetView() {
+  const canvas = $("pderiv-canvas");
+  if (canvas) canvas._vp = { xmin: -10, xmax: 10, ymin: -5, ymax: 5 };
+  precalcDerivDraw();
 }
 
 function precalcIntDraw() {
@@ -2306,15 +2647,29 @@ function precalcIntDraw() {
   const n = parseInt($("pint-n")?.value || 8);
   const rtype = $("pint-type")?.value || "mid";
   $("pint-nval").textContent = n;
-  const pad = 0.2;
-  const xmin = a - (b - a) * pad, xmax = b + (b - a) * pad;
+  if (!canvas._vp) {
+    const pad = 0.2;
+    canvas._vp_xRange = { a, b };
+    const xmin0 = a - (b - a) * pad, xmax0 = b + (b - a) * pad;
+    canvas._vp = { xmin: xmin0, xmax: xmax0 };
+  }
+  let { xmin, xmax } = canvas._vp;
+  if (a !== canvas._vp_xRange?.a || b !== canvas._vp_xRange?.b) {
+    const pad2 = 0.2;
+    xmin = a - (b - a) * pad2;
+    xmax = b + (b - a) * pad2;
+    canvas._vp = { xmin, xmax };
+    canvas._vp_xRange = { a, b };
+    canvas._vpY = null;
+  }
   const margin = 0.3;
   let maxY = 0;
   for (let i = 0; i <= 100; i++) {
     const x = a + (b - a) * i / 100;
     try { const y = Math.abs(Function("x", `return (${fx})`)(x)); if (isFinite(y) && y > maxY) maxY = y; } catch(e) {}
   }
-  const ymin = -maxY * margin, ymax = maxY * (1 + margin);
+  if (!canvas._vpY) canvas._vpY = { ymin: -maxY * margin, ymax: maxY * (1 + margin) };
+  const ymin = canvas._vpY.ymin, ymax = canvas._vpY.ymax;
   ctx.clearRect(0, 0, W, H);
   const px = x => (x - xmin) / (xmax - xmin) * W;
   const py = y => H - (y - ymin) / (ymax - ymin) * H;
@@ -2373,6 +2728,24 @@ function precalcIntDraw() {
       &nbsp; (${rtype === 'left' ? 'izquierda' : rtype === 'right' ? 'derecha' : 'punto medio'}, n=${n})
     `;
   }
+  if (!canvas._graphInited) {
+    canvas._graphInited = true;
+    makeGraphInteractive('pint-canvas', {
+      xmin: () => { const c = $("pint-canvas"); return c?._vp?.xmin ?? -0.4; },
+      xmax: () => { const c = $("pint-canvas"); return c?._vp?.xmax ?? 2.4; },
+      ymin: () => { const c = $("pint-canvas"); return c?._vpY?.ymin ?? -1; },
+      ymax: () => { const c = $("pint-canvas"); return c?._vpY?.ymax ?? 5; },
+      xmin_set: v => { const c = $("pint-canvas"); if (c) c._vp.xmin = v; },
+      xmax_set: v => { const c = $("pint-canvas"); if (c) c._vp.xmax = v; },
+      ymin_set: v => { const c = $("pint-canvas"); if (c) { if (!c._vpY) c._vpY = {}; c._vpY.ymin = v; } },
+      ymax_set: v => { const c = $("pint-canvas"); if (c) { if (!c._vpY) c._vpY = {}; c._vpY.ymax = v; } },
+    }, precalcIntDraw);
+  }
+}
+function pintResetView() {
+  const canvas = $("pint-canvas");
+  if (canvas) { canvas._vp = null; canvas._vpY = null; canvas._vp_xRange = null; }
+  precalcIntDraw();
 }
 
 /* ===== Layout Editor & Offline Download ===== */
@@ -2427,4 +2800,50 @@ async function downloadSite() {
     document.body.appendChild(a); a.click();
     document.body.removeChild(a); URL.revokeObjectURL(url);
   } catch(e) { alert('Error al descargar: ' + e.message); }
+}
+
+/* ===== Interactive Graph Engine (pan/zoom like GeoGebra) ===== */
+function makeGraphInteractive(canvasId, vp, redraw) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  let state = { dragging: false, sx: 0, sy: 0, v0: null };
+  const getV = () => ({
+    xmin: parseFloat(vp.xmin()),
+    xmax: parseFloat(vp.xmax()),
+    ymin: parseFloat(vp.ymin()),
+    ymax: parseFloat(vp.ymax())
+  });
+  const setV = (v) => {
+    vp.xmin_set(v.xmin); vp.xmax_set(v.xmax);
+    vp.ymin_set(v.ymin); vp.ymax_set(v.ymax);
+  };
+  canvas.addEventListener('mousedown', e => {
+    const r = canvas.getBoundingClientRect();
+    state.dragging = true; state.sx = e.clientX - r.left; state.sy = e.clientY - r.top; state.v0 = getV();
+    canvas.style.cursor = 'grabbing';
+  });
+  canvas.addEventListener('mousemove', e => {
+    if (!state.dragging) return;
+    const r = canvas.getBoundingClientRect();
+    const mx = e.clientX - r.left, my = e.clientY - r.top;
+    const dx = (mx - state.sx) / canvas.width, dy = (my - state.sy) / canvas.height;
+    const v = state.v0; const sx = v.xmax - v.xmin, sy = v.ymax - v.ymin;
+    setV({ xmin: v.xmin - dx * sx, xmax: v.xmax - dx * sx, ymin: v.ymin + dy * sy, ymax: v.ymax + dy * sy });
+    redraw();
+  });
+  const endDrag = () => { state.dragging = false; canvas.style.cursor = 'grab'; };
+  canvas.addEventListener('mouseup', endDrag);
+  canvas.addEventListener('mouseleave', endDrag);
+  canvas.style.cursor = 'grab';
+  canvas.addEventListener('wheel', e => {
+    e.preventDefault();
+    const r = canvas.getBoundingClientRect();
+    const mx = (e.clientX - r.left) / canvas.width, my = (e.clientY - r.top) / canvas.height;
+    const v = getV(); const sx = v.xmax - v.xmin, sy = v.ymax - v.ymin;
+    const f = e.deltaY > 0 ? 1.15 : 0.87;
+    const nsx = sx * f, nsy = sy * f;
+    const cx = v.xmin + mx * sx, cy = v.ymin + (1 - my) * sy;
+    setV({ xmin: cx - mx * nsx, xmax: cx + (1 - mx) * nsx, ymin: cy - (1 - my) * nsy, ymax: cy + my * nsy });
+    redraw();
+  }, { passive: false });
 }

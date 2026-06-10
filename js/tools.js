@@ -344,6 +344,55 @@ const TOOLS = [
     `,
     init: () => { precalcTab('func'); }
   },
+  {
+    id: "codestudio", icon: "💻", name: "CodeStudio", desc: "Editor multi-lenguaje con vista previa en vivo, terminal y gestor de archivos",
+    render: () => `
+      <div class="cs">
+        <div class="cs-bar">
+          <select class="cs-lang" id="cs-lang" onchange="csSetLang(this.value)">
+            <option value="html">HTML</option>
+            <option value="css">CSS</option>
+            <option value="javascript">JavaScript</option>
+            <option value="python">Python</option>
+            <option value="cpp">C++</option>
+            <option value="c">C</option>
+            <option value="csharp">C#</option>
+            <option value="php">PHP</option>
+            <option value="json">JSON</option>
+          </select>
+          <div class="cs-sep"></div>
+          <button class="cs-btn" onclick="csNewFile()">📄 Nueva</button>
+          <button class="cs-btn" onclick="csImport()">📂 Importar</button>
+          <button class="cs-btn" onclick="csExport()">📥 Exportar</button>
+          <div class="cs-sep"></div>
+          <button class="cs-btn cs-btn-primary" onclick="csRun()">▶ Ejecutar</button>
+          <button class="cs-btn cs-btn-primary" onclick="csLiveWin()">🔗 Live Server</button>
+        </div>
+        <div class="cs-tabs" id="cs-tabs"></div>
+        <div class="cs-main">
+          <div class="cs-editor">
+            <div class="cs-gutter" id="cs-gutter"></div>
+            <textarea class="cs-textarea" id="cs-code" spellcheck="false" oninput="csUpdateGutter()" onscroll="csSyncScroll()" onkeydown="csHandleKey(event)"></textarea>
+          </div>
+          <div class="cs-preview" id="cs-preview">
+            <iframe class="cs-iframe" id="cs-iframe"></iframe>
+            <div class="cs-preview-empty" id="cs-preview-empty">
+              <div>🔍 Vista previa</div>
+              <small>HTML se renderiza aquí en vivo · JS se ejecuta en la terminal</small>
+            </div>
+          </div>
+        </div>
+        <div class="cs-term" id="cs-term">
+          <div class="cs-term-out" id="cs-term-out"><span class="cs-term-muted">⎯ Consola lista · Presiona ▶ o escribe código aquí abajo</span></div>
+          <div class="cs-term-in">
+            <span class="cs-term-prompt">›</span>
+            <input class="cs-term-input" id="cs-term-input" placeholder="Escribe JS aquí..." onkeydown="csTermKey(event)">
+          </div>
+        </div>
+      </div>
+    `,
+    init: () => { csInit(); }
+  },
 ];
 
 const CONV = {

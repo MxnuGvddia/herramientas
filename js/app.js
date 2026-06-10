@@ -2874,6 +2874,248 @@ function makeGraphInteractive(canvasId, vp, redraw) {
   }, { passive: false });
 }
 
+/* ===== CodeStudio ===== */
+let _csFiles = [];
+let _csCurrent = 0;
+let _csLangMap = { html:'html', css:'css', javascript:'javascript', python:'python', cpp:'text/x-c++src', c:'text/x-csrc', csharp:'text/x-csharp', php:'php', json:'application/json' };
+const _csExtMap = { html:'.html', css:'.css', javascript:'.js', python:'.py', cpp:'.cpp', c:'.c', csharp:'.cs', php:'.php', json:'.json' };
+const _csTemplates = {
+  html:'<!DOCTYPE html>\n<html lang="es">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width,initial-scale=1.0">\n  <title>Mi Página</title>\n  <style>\n    * { margin:0; padding:0; box-sizing:border-box; }\n    body { font-family:system-ui,sans-serif; background:#f5f5f5; color:#333; padding:40px; display:flex; justify-content:center; align-items:center; min-height:100vh; }\n    h1 { color:#7c3aed; }\n  </style>\n</head>\n<body>\n  <h1>Hola Mundo</h1>\n</body>\n</html>',
+  css:'* { margin:0; padding:0; box-sizing:border-box; }\nbody { font-family:system-ui,sans-serif; background:#f5f5f5; color:#333; padding:40px; }\n.container { max-width:800px; margin:0 auto; }\nh1 { color:#7c3aed; font-size:2rem; }',
+  javascript:'function saludar(nombre) {\n  return `Hola, ${nombre}!`;\n}\n\nconst msg = saludar("Mundo");\nconsole.log(msg);\n\n// Escribe tu código aquí',
+  python:'def saludar(nombre):\n    return f"Hola, {nombre}!"\n\nprint(saludar("Mundo"))',
+  cpp:'#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << "Hola Mundo" << endl;\n    return 0;\n}',
+  c:'#include <stdio.h>\n\nint main() {\n    printf("Hola Mundo\\n");\n    return 0;\n}',
+  csharp:'using System;\n\nclass Program {\n    static void Main() {\n        Console.WriteLine("Hola Mundo");\n    }\n}',
+  php:'<?php\n$saludo = "Hola Mundo";\necho $saludo;\n?>',
+  json:'{\n  "nombre": "CodeStudio",\n  "version": "1.0",\n  "lenguajes": ["HTML","CSS","JS","Python"],\n  "opensource": true\n}'
+};
+
+function csInit() {
+  _csFiles = [{ name:'index.html', lang:'html', content:_csTemplates.html }];
+  _csCurrent = 0;
+  setTimeout(() => { csRenderTabs(); csRenderEditor(); csUpdatePreview(); }, 50);
+}
+
+function csRenderTabs() {
+  const el = document.getElementById('cs-tabs');
+  if (!el) return;
+  el.innerHTML = _csFiles.map((f,i) =>
+    `<div class="cs-tab ${i===_csCurrent?'active':''}" onclick="csSwitchFile(${i})">
+      ${f.name}
+      ${_csFiles.length>1 ? `<span class="cs-tab-close" onclick="event.stopPropagation();csCloseFile(${i})">✕</span>` : ''}
+    </div>`
+  ).join('');
+}
+
+function csRenderEditor() {
+  const f = _csFiles[_csCurrent];
+  if (!f) return;
+  const ta = document.getElementById('cs-code');
+  const sel = document.getElementById('cs-lang');
+  if (ta) { ta.value = f.content; }
+  if (sel) { sel.value = f.lang; }
+  csUpdateGutter();
+  csUpdatePreview();
+}
+
+function csSwitchFile(i) {
+  csSaveCurrent();
+  _csCurrent = i;
+  csRenderTabs();
+  csRenderEditor();
+}
+
+function csCloseFile(i) {
+  if (_csFiles.length < 2) return;
+  _csFiles.splice(i, 1);
+  if (_csCurrent >= _csFiles.length) _csCurrent = _csFiles.length - 1;
+  csRenderTabs();
+  csRenderEditor();
+}
+
+function csNewFile() {
+  csSaveCurrent();
+  const lang = document.getElementById('cs-lang').value;
+  const name = `archivo${_csExtMap[lang] || '.txt'}`;
+  _csFiles.push({ name, lang, content:_csTemplates[lang] || '' });
+  _csCurrent = _csFiles.length - 1;
+  csRenderTabs();
+  csRenderEditor();
+}
+
+function csSetLang(lang) {
+  const f = _csFiles[_csCurrent];
+  if (!f) return;
+  const newName = f.name.replace(/\.[^.]+$/, _csExtMap[lang] || '.txt');
+  f.lang = lang;
+  f.name = newName;
+  csRenderTabs();
+  csRenderEditor();
+}
+
+function csSaveCurrent() {
+  const ta = document.getElementById('cs-code');
+  const f = _csFiles[_csCurrent];
+  if (ta && f) f.content = ta.value;
+}
+
+function csUpdateGutter() {
+  const ta = document.getElementById('cs-code');
+  const g = document.getElementById('cs-gutter');
+  if (!ta || !g) return;
+  const lines = ta.value.split('\n').length;
+  g.innerHTML = Array.from({length:lines}, (_,i) => `<div>${i+1}</div>`).join('');
+}
+
+function csSyncScroll() {
+  const ta = document.getElementById('cs-code');
+  const g = document.getElementById('cs-gutter');
+  if (ta && g) g.scrollTop = ta.scrollTop;
+}
+
+function csHandleKey(e) {
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const ta = e.target;
+    const start = ta.selectionStart;
+    ta.value = ta.value.substring(0, start) + '  ' + ta.value.substring(ta.selectionEnd);
+    ta.selectionStart = ta.selectionEnd = start + 2;
+    csUpdateGutter();
+  }
+}
+
+function csTermClear() {
+  const out = document.getElementById('cs-term-out');
+  if (out) out.innerHTML = '';
+}
+
+function csTermLog(...args) {
+  const out = document.getElementById('cs-term-out');
+  if (!out) return;
+  const text = args.map(a => typeof a === 'object' ? JSON.stringify(a, null, 2) : String(a)).join(' ');
+  out.innerHTML += `<div>> ${text}</div>`;
+  out.scrollTop = out.scrollHeight;
+}
+
+function csTermKey(e) {
+  if (e.key === 'Enter') {
+    const inp = document.getElementById('cs-term-input');
+    if (!inp) return;
+    const code = inp.value.trim();
+    if (!code) return;
+    inp.value = '';
+    csTermLog(`\u001b[1m${code}\u001b[0m`);
+    try {
+      const result = eval(code);
+      if (result !== undefined) csTermLog(result);
+    } catch(e) { csTermLog(`\u001b[31mError: ${e.message}\u001b[0m`); }
+  }
+}
+
+function csRun() {
+  csSaveCurrent();
+  const f = _csFiles[_csCurrent];
+  if (!f) return;
+  const out = document.getElementById('cs-term-out');
+  if (out) out.innerHTML = '';
+  csTermLog(`\u001b[36m\u00bb Ejecutando ${f.name}...\u001b[0m`);
+
+  if (f.lang === 'html') {
+    csUpdatePreview();
+    csTermLog('HTML renderizado en la vista previa');
+  } else if (f.lang === 'css') {
+    csUpdatePreview();
+    csTermLog('CSS aplicado a la vista previa');
+  } else if (f.lang === 'javascript') {
+    const logs = [];
+    const _log = console.log, _err = console.error, _warn = console.warn;
+    console.log = (...a) => { logs.push(a.map(x=>typeof x==='object'?JSON.stringify(x,null,2):String(x)).join(' ')); csTermLog(...a); };
+    console.error = (...a) => { logs.push('\u001b[31m'+a.map(x=>String(x)).join(' ')); csTermLog('\u001b[31m'+a.map(x=>String(x)).join(' ')+'\u001b[0m'); };
+    console.warn = (...a) => { logs.push('\u001b[33m'+a.map(x=>String(x)).join(' ')); csTermLog('\u001b[33m'+a.map(x=>String(x)).join(' ')+'\u001b[0m'); };
+    try {
+      const result = eval(f.content);
+      if (result !== undefined && logs.length === 0) csTermLog(result);
+    } catch(e) { csTermLog(`\u001b[31mError: ${e.message}\u001b[0m`); }
+    console.log = _log; console.error = _err; console.warn = _warn;
+  } else {
+    csTermLog(`\u001b[33m\u26a0 ${f.lang.toUpperCase()} no puede ejecutarse en el navegador. Usa la terminal para JS o previsualiza HTML/CSS.\u001b[0m`);
+    csTermLog(`Código guardado en "${f.name}" — puedes exportarlo con \u00abExportar\u00bb`);
+  }
+}
+
+function csUpdatePreview() {
+  csSaveCurrent();
+  const f = _csFiles[_csCurrent];
+  const ifr = document.getElementById('cs-iframe');
+  const empty = document.getElementById('cs-preview-empty');
+  if (!ifr || !empty) return;
+  
+  if (f.lang === 'html') {
+    empty.style.display = 'none';
+    ifr.srcdoc = f.content;
+  } else if (f.lang === 'css') {
+    empty.style.display = 'none';
+    ifr.srcdoc = `<!DOCTYPE html><html><head><style>${f.content}</style></head><body><div style="padding:20px;font-family:sans-serif"><h1>Vista previa CSS</h1><p style="color:#666">Este CSS se aplicaría a tu HTML.</p><hr><pre style="background:#f5f5f5;padding:12px;border-radius:6px;font-size:13px">${f.content.replace(/</g,'&lt;')}</pre></div></body></html>`;
+  } else {
+    ifr.srcdoc = '';
+    empty.style.display = 'flex';
+  }
+}
+
+function csLiveWin() {
+  csSaveCurrent();
+  const f = _csFiles[_csCurrent];
+  if (f.lang !== 'html') {
+    csTermLog('\u001b[33m\u26a0 Live Server solo funciona con archivos HTML\u001b[0m');
+    return;
+  }
+  const w = window.open('', 'cs-live', 'width=1024,height=700');
+  if (!w) { csTermLog('\u001b[31mError: Bloquea ventanas emergentes. Permite popups para Live Server.\u001b[0m'); return; }
+  w.document.write(f.content);
+  w.document.close();
+  csTermLog(`\u001b[36m\u00bb Live Server abierto en ventana externa (mismo dominio)\u001b[0m`);
+}
+
+function csImport() {
+  const inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = '.html,.css,.js,.py,.cpp,.c,.cs,.php,.json,.txt,.*';
+  inp.onchange = () => {
+    const file = inp.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const content = e.target.result;
+      const ext = file.name.split('.').pop().toLowerCase();
+      const langMap = { html:'html', htm:'html', css:'css', js:'javascript', py:'python', cpp:'cpp', c:'c', cs:'csharp', php:'php', json:'json', txt:'javascript' };
+      const lang = langMap[ext] || 'javascript';
+      csSaveCurrent();
+      _csFiles.push({ name:file.name, lang, content });
+      _csCurrent = _csFiles.length - 1;
+      csRenderTabs();
+      csRenderEditor();
+      csTermLog(`\u001b[36m\u00bb Importado: ${file.name}\u001b[0m`);
+    };
+    reader.readAsText(file);
+  };
+  inp.click();
+}
+
+function csExport() {
+  csSaveCurrent();
+  const f = _csFiles[_csCurrent];
+  if (!f) return;
+  const blob = new Blob([f.content], { type:'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = f.name;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+  csTermLog(`\u001b[36m\u00bb Exportado: ${f.name}\u001b[0m`);
+}
+
 /* ===== Dynamic Background Engine ===== */
 let _bgParticles = [];
 let _bg3D = null;

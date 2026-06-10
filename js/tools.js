@@ -345,7 +345,7 @@ const TOOLS = [
     init: () => { precalcTab('func'); }
   },
   {
-    id: "codestudio", icon: "💻", name: "CodeStudio", desc: "Editor multi-lenguaje con vista previa en vivo, terminal y gestor de archivos",
+    id: "codestudio", icon: "💻", name: "CodeStudio", desc: "Editor multi-lenguaje con previsualización en vivo, terminal y gestor de archivos",
     render: () => `
       <div class="cs">
         <div class="cs-bar">

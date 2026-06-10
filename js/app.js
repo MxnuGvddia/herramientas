@@ -1,4 +1,3 @@
-/* App */
 const $ = id => document.getElementById(id);
 const page = $("page-content");
 
@@ -65,7 +64,7 @@ window.addEventListener("hashchange", () => {
 
 homePage();
 
-/* Calculator Engine — sub-tabs */
+
 function calcTab(tab) {
   const c = $("calc-engine-content");
   const t = {
@@ -388,7 +387,7 @@ function calcTab(tab) {
   if (tab === 'bases') { setTimeout(() => { baseConvert(10); }, 50); }
 }
 
-/* Basic calc helpers */
+
 function calcInsert(ch) {
   const inp = $("calc-expr");
   if (!inp) return;
@@ -420,7 +419,7 @@ function calcEval() {
   }
 }
 
-/* Graph plotter */
+
 function graphPlot() {
   const canvas = $("graph-canvas");
   if (!canvas) return;
@@ -500,7 +499,7 @@ function resetGraphView() {
   graphPlot();
 }
 
-/* Calculus */
+
 function calcDeriv() {
   const fx = $("calc-deriv-fx")?.value;
   const x = parseFloat($("calc-deriv-x")?.value);
@@ -556,7 +555,7 @@ function calcSum() {
   } catch(e) { $("calc-sum-result").textContent = "Error"; }
 }
 
-/* Physics */
+
 function physMRU() {
   const d = parseFloat($("phys-mru-d")?.value), t = parseFloat($("phys-mru-t")?.value);
   if (!isNaN(d) && !isNaN(t) && t !== 0) $("phys-mru-v").value = (d / t).toFixed(4);
@@ -575,7 +574,7 @@ function physMRUA() {
   }
 }
 
-/* Complex numbers */
+
 function compParse(s) {
   s = s.replace(/\s/g, '').replace(/i/g, 'j');
   const re = s.match(/^([+-]?\d*\.?\d*)/);
@@ -608,7 +607,7 @@ function compUnary(op) {
   $("comp-result").innerHTML = `<div class="result-box" style="font-size:1.1rem;text-align:center">${val}</div>`;
 }
 
-/* Number bases */
+
 let baseUpdating = false;
 function baseConvert(fromBase) {
   if (baseUpdating) return;
@@ -637,7 +636,7 @@ function baseExamples() {
   baseUpdating = false;
 }
 
-/* Electricity */
+
 function elecOhm() {
   const v = parseFloat($("elec-v")?.value), i = parseFloat($("elec-i")?.value);
   if (!isNaN(v) && !isNaN(i) && i !== 0) $("elec-r").value = (v / i).toFixed(4);
@@ -651,7 +650,7 @@ function elecParalelo() {
   if (!isNaN(r1) && !isNaN(r2) && (r1 !== 0 || r2 !== 0)) $("elec-rp-total").value = ((1/r1 + 1/r2) > 0 ? 1 / (1/r1 + 1/r2) : 0).toFixed(4);
 }
 
-/* Resistor color code */
+
 const RES_COLORS = ['#000','#8B4513','#d00','#FF8C00','#FFD700','#228B22','#06f','#8B008B','#808080','#eee'];
 const RES_MULT_COLORS = {1:'#000',10:'#8B4513',100:'#d00',1000:'#FF8C00',10000:'#FFD700',100000:'#228B22',1000000:'#06f',10000000:'#8B008B',0.1:'#DAA520',0.01:'#C0C0C0'};
 const RES_TOL_COLORS = {1:'#8B4513',2:'#d00',5:'#DAA520',10:'#C0C0C0',20:'transparent'};
@@ -676,7 +675,7 @@ function resistorCalc() {
   `;
 }
 
-/* Chemistry */
+
 const ATOMIC = {
   H:1, He:4, Li:7, Be:9, B:11, C:12, N:14, O:16, F:19, Ne:20,
   Na:23, Mg:24, Al:27, Si:28, P:31, S:32, Cl:35.5, Ar:40,
@@ -708,7 +707,7 @@ function chemMoles() {
   if (!isNaN(m) && !isNaN(M) && M !== 0) $("chem-moles-result").textContent = (m / M).toFixed(4) + ' mol';
 }
 
-/* Statistics */
+
 function calcStat() {
   const data = $("stat-data")?.value.split(',').map(x => parseFloat(x.trim())).filter(x => !isNaN(x));
   if (!data || data.length === 0) return;
@@ -739,7 +738,7 @@ function calcStat() {
   `;
 }
 
-/* Rule of 3 */
+
 let rule3Direct = true;
 function rule3Calc() {
   const a = parseFloat($("rule3-a")?.value), b = parseFloat($("rule3-b")?.value), c = parseFloat($("rule3-c")?.value);
@@ -1151,7 +1150,7 @@ function asciiGen() {
   $("ascii-output").textContent = lines.join("\n");
 }
 
-/* MD1 — Mate Discreta 1 */
+
 const MD1_OPS = { '¬': 5, '∧': 4, '∨': 3, '⊕': 3, '→': 2, '↔': 1 };
 
 function md1Kbd(inputId, opts) {
@@ -1832,7 +1831,7 @@ function md1ShowRules() {
   md1Tab('laws');
 }
 
-/* ===== Particiones / Bell Numbers ===== */
+
 function md1ShowPartitions() {
   const s = $("md1-pset")?.value.split(',').map(x => x.trim()).filter(Boolean);
   if (!s || s.length === 0) { $("md1-partition-result").innerHTML = '<div class="result-box error">Ingresa elementos válidos</div>'; return; }
@@ -1867,7 +1866,7 @@ function md1ShowPartitions() {
   $("md1-partition-result").innerHTML = html;
 }
 
-/* ===== Falacias ===== */
+
 function md1DetectFalacia() {
   const text = $("md1-falacia-input")?.value.trim();
   if (!text) return;
@@ -1915,7 +1914,7 @@ function md1DetectFalacia() {
   }
 }
 
-/* ===== MD1 Estudio Interactivo ===== */
+
 function md1StudyTab(tab) {
   const c = $("md1-study-content");
   if (!c) return;
@@ -2260,7 +2259,7 @@ function boolTokenize(s) {
   return tokens;
 }
 
-/* ===== Precálculo / Cálculo 1 Interactivo ===== */
+
 function precalcTab(tab) {
   const c = $("precalc-content");
   if (!c) return;
@@ -2773,7 +2772,7 @@ function pintResetView() {
   precalcIntDraw();
 }
 
-/* ===== Layout Editor & Offline Download ===== */
+
 function getLayout() {
   try { const s = localStorage.getItem('herramientas_layout'); return s ? JSON.parse(s) : null; } catch(e) { return null; }
 }
@@ -2828,7 +2827,7 @@ async function downloadSite() {
   } catch(e) { alert('Error al descargar: ' + e.message); }
 }
 
-/* ===== Interactive Graph Engine (pan/zoom like GeoGebra) ===== */
+
 function makeGraphInteractive(canvasId, vp, redraw) {
   const canvas = document.getElementById(canvasId);
   if (!canvas) return;
@@ -2874,7 +2873,7 @@ function makeGraphInteractive(canvasId, vp, redraw) {
   }, { passive: false });
 }
 
-/* ===== CodeStudio ===== */
+
 let _csFiles = [];
 let _csCurrent = 0;
 let _csLangMap = { html:'html', css:'css', javascript:'javascript', python:'python', cpp:'text/x-c++src', c:'text/x-csrc', csharp:'text/x-csharp', php:'php', json:'application/json' };
@@ -3116,7 +3115,7 @@ function csExport() {
   csTermLog(`\u001b[36m\u00bb Exportado: ${f.name}\u001b[0m`);
 }
 
-/* ===== Dynamic Background Engine ===== */
+
 let _bgParticles = [];
 let _bg3D = null;
 let _bgRAF = null;
@@ -3145,7 +3144,7 @@ function _getPalette() {
   return p;
 }
 
-// ---- 2D Particles ----
+
 function _bgInitParticles() {
   const canvas = document.getElementById('bg-canvas');
   if (!canvas) return;
@@ -3157,7 +3156,7 @@ function _bgInitParticles() {
   window.addEventListener('resize', resize);
 
   const palette = _getPalette();
-  const count = _bgCfg.preset === 'breathing' ? 60 : 90;
+  const count = _bgCfg.preset === 'breathing' ? 60 : 91;
   const isBreathing = _bgCfg.preset === 'breathing';
   const breathColor = palette[0];
   _bgParticles = [];
@@ -3238,7 +3237,7 @@ function _bgInitParticles() {
   draw();
 }
 
-// ---- 3D World ----
+
 function _bgInit3D() {
   const canvas = document.getElementById('bg-canvas');
   if (!canvas || typeof THREE === 'undefined') return;
@@ -3263,7 +3262,7 @@ function _bgInit3D() {
   ];
 
   const objects = [];
-  const count = _bgCfg.preset === 'breathing' ? 50 : 35;
+  const count = _bgCfg.preset === 'breathing' ? 50 : 36;
   for (let i = 0; i < count; i++) {
     const g = geos[i % geos.length];
     const c = palette[i % palette.length];
@@ -3350,7 +3349,7 @@ function initBg() {
   else _bgInitParticles();
 }
 
-// ---- Settings UI ----
+
 function openBgSettings() {
   const existing = document.getElementById('bg-settings-modal');
   if (existing) existing.remove();
@@ -3403,7 +3402,7 @@ function setBgPreset(preset) {
   document.querySelectorAll('#bg-settings-modal [onclick*="setBgPreset"]').forEach(b => b.classList.toggle('active', b.getAttribute('onclick').includes(preset)));
 }
 
-// Auto-init
+
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initBg);
 } else {

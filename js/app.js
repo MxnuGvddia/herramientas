@@ -4,17 +4,38 @@ const page = $("page-content");
 
 function homePage() {
   document.title = "Herramientas Gratis — Calculadoras, Conversores y Utilidades";
+  const layout = getLayout();
+  const tools = layout ? layout.map(id => TOOLS.find(t => t.id === id)).filter(Boolean) : TOOLS;
+  const isEdit = window._layoutEditing || false;
   page.innerHTML = `
+    <div class="home-toolbar" style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;align-items:center">
+      <button class="btn btn-secondary" onclick="toggleLayoutEdit()" style="font-size:.8rem;padding:6px 14px">${isEdit ? '✏️ Terminar edición' : '✏️ Editar Layout'}</button>
+      <button class="btn btn-secondary" onclick="downloadSite()" style="font-size:.8rem;padding:6px 14px">📥 Descargar sitio</button>
+      ${isEdit ? '<span style="font-size:.8rem;color:var(--muted)">Arrastra las tarjetas para reordenar</span>' : ''}
+      ${isEdit ? '<button class="btn" onclick="saveLayout()" style="font-size:.8rem;padding:6px 14px">💾 Guardar layout</button>' : ''}
+    </div>
     <div class="ad-banner ad-rect"><div class="ad-placeholder">— Publicidad —</div></div>
-    <div class="tool-grid">${TOOLS.map(t => `
-      <div class="tool-card" onclick="navigate('${t.id}')">
-        <div class="icon">${t.icon}</div>
-        <h3>${t.name}</h3>
-        <p>${t.desc}</p>
-      </div>
-    `).join("")}</div>
+    <div class="tool-grid ${isEdit ? 'editing' : ''}" id="tool-grid">
+      ${tools.map(t => `
+        <div class="tool-card" draggable="${isEdit}" data-tool-id="${t.id}"${isEdit ? '' : ` onclick="navigate('${t.id}')"`}>
+          ${isEdit ? '<span class="drag-handle">⠿</span>' : ''}
+          <div class="icon">${t.icon}</div>
+          <h3>${t.name}</h3>
+          <p>${t.desc}</p>
+        </div>
+      `).join('')}
+    </div>
     <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
   `;
+  if (isEdit) {
+    const grid = $("tool-grid");
+    if (grid) {
+      grid.addEventListener('dragstart', dragStart);
+      grid.addEventListener('dragover', dragOver);
+      grid.addEventListener('drop', drop);
+      grid.addEventListener('dragend', dragEnd);
+    }
+  }
 }
 
 function toolPage(id) {
@@ -2352,4 +2373,58 @@ function precalcIntDraw() {
       &nbsp; (${rtype === 'left' ? 'izquierda' : rtype === 'right' ? 'derecha' : 'punto medio'}, n=${n})
     `;
   }
+}
+
+/* ===== Layout Editor & Offline Download ===== */
+function getLayout() {
+  try { const s = localStorage.getItem('herramientas_layout'); return s ? JSON.parse(s) : null; } catch(e) { return null; }
+}
+function saveLayout() {
+  const grid = $("tool-grid");
+  if (!grid) return;
+  const order = Array.from(grid.querySelectorAll('.tool-card')).map(c => c.dataset.toolId);
+  localStorage.setItem('herramientas_layout', JSON.stringify(order));
+  window._layoutEditing = false;
+  homePage();
+}
+function toggleLayoutEdit() {
+  window._layoutEditing = !window._layoutEditing;
+  homePage();
+}
+let _dragSrc = null;
+function dragStart(e) {
+  _dragSrc = e.target.closest('.tool-card');
+  if (!_dragSrc || !_dragSrc.draggable) return;
+  e.dataTransfer.effectAllowed = 'move';
+  _dragSrc.classList.add('dragging');
+}
+function dragOver(e) {
+  e.preventDefault();
+  const t = e.target.closest('.tool-card');
+  if (!t || t === _dragSrc) return;
+  const g = t.parentNode; const r = t.getBoundingClientRect();
+  g.insertBefore(_dragSrc, e.clientY < r.top + r.height / 2 ? t : t.nextSibling);
+}
+function drop(e) { e.preventDefault(); }
+function dragEnd(e) { const c = e.target.closest('.tool-card'); if (c) c.classList.remove('dragging'); _dragSrc = null; }
+async function downloadSite() {
+  try {
+    const [html, css, tools, app] = await Promise.all([
+      fetch('index.html').then(r => r.text()),
+      fetch('css/style.css').then(r => r.text()),
+      fetch('js/tools.js').then(r => r.text()),
+      fetch('js/app.js').then(r => r.text())
+    ]);
+    const combined = html
+      .replace('<link rel="stylesheet" href="css/style.css">', `<style>${css}</style>`)
+      .replace('<script src="js/tools.js"></script>', `<script>${tools}\n</script>`)
+      .replace('<script src="js/app.js"></script>', `<script>${app}\n</script>`)
+      .replace(/<div class="ad-placeholder">— Publicidad —<\/div>/g, '<div class="ad-placeholder" style="background:#f0f0f0;border-radius:8px;padding:12px;text-align:center;color:#999;font-size:.75rem;border:1px dashed #ddd">📦 Sin conexión</div>');
+    const blob = new Blob([combined], {type: 'text/html'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'herramientas-offline.html';
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(url);
+  } catch(e) { alert('Error al descargar: ' + e.message); }
 }

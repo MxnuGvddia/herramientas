@@ -149,3 +149,10 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--p
 /* Footer */
 .footer { margin-top: 48px; padding: 24px 0; border-top: 1px solid var(--border); text-align: center; }
 .footer-text { color: var(--muted); font-size: .8rem; margin-top: 16px; }
+
+/* Layout Editor */
+.tool-grid.editing .tool-card { position: relative; cursor: grab; border-color: var(--primary); border-style: dashed; }
+.tool-grid.editing .tool-card:active { cursor: grabbing; }
+.tool-card.dragging { opacity: 0.4; }
+.drag-handle { position: absolute; top: 6px; right: 8px; cursor: grab; font-size: 1.2rem; color: var(--muted); user-select: none; line-height: 1; }
+.drag-handle:hover { color: var(--primary); }

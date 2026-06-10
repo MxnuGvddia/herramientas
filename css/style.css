@@ -345,7 +345,7 @@ input:focus, select:focus, textarea:focus {
 ::-webkit-scrollbar-thumb:hover { background: rgba(124,58,237,.5); }
 
 
-.cs { display:flex; flex-direction:column; gap:0; height:calc(100vh - 195px); min-height:400px; }
+.cs { display:flex; flex-direction:column; gap:0; height:calc(100vh - 110px); min-height:400px; }
 .cs-lbl { font-size:.75rem; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-right:2px; }
 .cs-bar { display:flex; gap:6px; align-items:center; padding:8px 10px; background:rgba(0,0,0,.2); border-radius:10px 10px 0 0; border:1px solid var(--border); border-bottom:none; flex-wrap:wrap; }
 .cs-lang { background:rgba(30,30,60,.9); color:var(--text); border:1px solid var(--border); border-radius:6px; padding:4px 8px; font-size:.8rem; cursor:pointer; }
@@ -388,8 +388,12 @@ input:focus, select:focus, textarea:focus {
 .cs-term-input { flex:1; background:transparent; border:none; color:var(--text); font-family:'JetBrains Mono','Fira Code',monospace; font-size:.8rem; outline:none; }
 .cs-term-input::placeholder { color:var(--muted); font-style:italic; }
 
-.tool-page:has(.cs) { padding:12px 0; }
+.tool-page:has(.cs) { padding:0; }
 .tool-box:has(.cs) { padding:0; background:transparent; border:none; backdrop-filter:none; box-shadow:none; border-radius:0; }
+body.cs-active .footer { display:none; }
+body.cs-active .tool-page { padding:0; }
+body.cs-active .tool-page .back { margin-bottom:4px; }
+body.cs-active .tool-page h1, body.cs-active .tool-page .desc { display:none; }
 
 @media(max-width:720px) { .cs-main:not(.cs-col) { flex-direction:column; } .cs-preview { border-left:none; border-top:1px solid var(--border); min-height:200px; } .cs-term { max-height:120px; } .cs { height:calc(100vh - 180px); } }
 

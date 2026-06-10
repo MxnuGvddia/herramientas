@@ -58,6 +58,7 @@ function navigate(hash) {
 }
 
 window.addEventListener("hashchange", () => {
+  document.body.classList.remove('cs-active');
   const id = window.location.hash.replace("#", "");
   id ? toolPage(id) : homePage();
 });
@@ -2950,6 +2951,7 @@ function csInitResizer() {
 function csInit() {
   _csFiles = [{ name:'index.html', lang:'html', content:_csTemplates.html }];
   _csCurrent = 0;
+  document.body.classList.add('cs-active');
   setTimeout(() => {
     csRenderTabs();
     csRenderEditor();

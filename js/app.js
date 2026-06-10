@@ -3020,20 +3020,22 @@ function _bgInit3D() {
   ];
 
   const objects = [];
-  const count = _bgCfg.preset === 'breathing' ? 60 : 40;
+  const count = _bgCfg.preset === 'breathing' ? 50 : 35;
   for (let i = 0; i < count; i++) {
     const g = geos[i % geos.length];
     const c = palette[i % palette.length];
     const mat = new THREE.MeshPhongMaterial({ color: c, transparent: true, opacity: 0.5 + Math.random() * 0.3, shininess: 20, flatShading: true });
     const m = new THREE.Mesh(g, mat);
-    const s = 0.2 + Math.random() * 0.6;
+    const s = 0.5 + Math.random() * 0.9;
     m.scale.set(s, s, s);
     m.position.set((Math.random() - 0.5) * 70, (Math.random() - 0.5) * 50, (Math.random() - 0.5) * 30);
     m.rotation.set(Math.random() * 6, Math.random() * 6, Math.random() * 6);
     m.userData = {
-      rx: (Math.random() - 0.5) * 0.008, ry: (Math.random() - 0.5) * 0.008, rz: (Math.random() - 0.5) * 0.004,
-      baseY: m.position.y, phase: Math.random() * Math.PI * 2,
-      speed: 0.003 + Math.random() * 0.004, amp: 0.2 + Math.random() * 0.6
+      rx: (Math.random() - 0.5) * 0.012, ry: (Math.random() - 0.5) * 0.012, rz: (Math.random() - 0.5) * 0.006,
+      baseX: m.position.x, baseY: m.position.y, baseZ: m.position.z,
+      phaseX: Math.random() * Math.PI * 2, phaseY: Math.random() * Math.PI * 2, phaseZ: Math.random() * Math.PI * 2,
+      speedX: 0.003 + Math.random() * 0.005, speedY: 0.003 + Math.random() * 0.005, speedZ: 0.002 + Math.random() * 0.004,
+      ampX: 0.3 + Math.random() * 0.8, ampY: 0.3 + Math.random() * 0.8, ampZ: 0.2 + Math.random() * 0.5
     };
     scene.add(m);
     objects.push(m);
@@ -3048,21 +3050,27 @@ function _bgInit3D() {
   d2.position.set(-15, -10, -20);
   scene.add(d2);
 
-  let mx = 0, my = 0;
+  let mx = 0, my = 0, autoAngle = 0;
   const onMouse = e => { mx = (e.clientX / window.innerWidth) * 2 - 1; my = -(e.clientY / window.innerHeight) * 2 + 1; };
   document.addEventListener('mousemove', onMouse);
 
   let time = 0;
   function anim() {
     time += 0.01;
+    autoAngle += 0.0004;
     const breath = _bgCfg.preset === 'breathing' ? 0.4 + 0.6 * Math.sin(time * 0.8) : 1;
+    const wave = Math.sin(time * 0.3) * 0.2;
     for (const o of objects) {
-      o.rotation.x += o.userData.rx; o.rotation.y += o.userData.ry; o.rotation.z += o.userData.rz;
-      o.position.y = o.userData.baseY + Math.sin(time * o.userData.speed * 10 + o.userData.phase) * o.userData.amp * breath;
-      o.material.opacity = (0.4 + Math.random() * 0.001) * breath;
+      o.rotation.x += o.userData.rx + wave * 0.002;
+      o.rotation.y += o.userData.ry;
+      o.rotation.z += o.userData.rz + Math.sin(time * 0.1 + o.userData.phaseZ) * 0.001;
+      o.position.x = o.userData.baseX + Math.sin(time * o.userData.speedX * 8 + o.userData.phaseX) * o.userData.ampX * breath;
+      o.position.y = o.userData.baseY + Math.sin(time * o.userData.speedY * 8 + o.userData.phaseY + 1) * o.userData.ampY * breath;
+      o.position.z = o.userData.baseZ + Math.sin(time * o.userData.speedZ * 6 + o.userData.phaseZ + 2) * o.userData.ampZ * breath * 0.6;
+      o.material.opacity = (0.5 + 0.3 * Math.sin(time * 0.5 + o.userData.phaseY)) * breath;
     }
-    camera.position.x += (mx * 4 - camera.position.x) * 0.015;
-    camera.position.y += (my * 3 - camera.position.y) * 0.015;
+    camera.position.x += (mx * 5 + Math.sin(autoAngle) * 2 - camera.position.x) * 0.015;
+    camera.position.y += (my * 4 + Math.cos(autoAngle * 0.7) * 1.5 - camera.position.y) * 0.015;
     camera.lookAt(0, 0, 0);
     renderer.render(scene, camera);
     _bgRAF = requestAnimationFrame(anim);

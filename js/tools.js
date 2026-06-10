@@ -322,10 +322,13 @@ const TOOLS = [
     render: () => `
       <div class="tabs" style="display:flex;gap:4px;margin-bottom:16px;flex-wrap:wrap">
         <button class="btn btn-secondary" style="flex:1" onclick="md1Tab('truth')">📋 Tabla de Verdad</button>
-        <button class="btn btn-secondary" style="flex:1" onclick="md1Tab('eval')">🔢 Evaluar Proposición</button>
+        <button class="btn btn-secondary" style="flex:1" onclick="md1Tab('eval')">🔢 Evaluar</button>
         <button class="btn btn-secondary" style="flex:1" onclick="md1Tab('proof')">🔍 Demostración</button>
         <button class="btn btn-secondary" style="flex:1" onclick="md1Tab('sets')">📚 Conjuntos</button>
-        <button class="btn btn-secondary" style="flex:1" onclick="md1Tab('laws')">📜 Leyes y Reglas</button>
+        <button class="btn btn-secondary" style="flex:1" onclick="md1Tab('bool')">🔲 Álgebra Boole</button>
+        <button class="btn btn-secondary" style="flex:1" onclick="md1Tab('gates')">⚡ Compuertas</button>
+        <button class="btn btn-secondary" style="flex:1" onclick="md1Tab('intro')">🧩 Introducción</button>
+        <button class="btn btn-secondary" style="flex:1" onclick="md1Tab('laws')">📜 Leyes</button>
       </div>
       <div id="md1-content"></div>
     `,

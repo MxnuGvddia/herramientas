@@ -585,6 +585,209 @@ function md1Tab(tab) {
     <div id="md1-sets-result" style="margin-top:12px"></div>
     <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
   `;
+  else if (tab === 'bool') c.innerHTML = `
+    <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
+    <p style="margin-bottom:8px">Álgebra de Boole: evalúa expresiones con variables <b>A, B, C</b> usando + (OR), · (AND), ¬ o ' (NOT)</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <input type="text" id="bool-expr" value="A·B + A·C" style="flex:1;min-width:180px" placeholder="Ej: A + B·C" onkeydown="if(event.key==='Enter')boolEval()">
+      <button class="btn" onclick="boolEval()">📋 Generar Tabla</button>
+      <button class="btn btn-secondary" onclick="document.getElementById('bool-expr').value='A + A·B';boolEval()">A+A·B</button>
+      <button class="btn btn-secondary" onclick="document.getElementById('bool-expr').value='(A+B)·(A+C)';boolEval()">(A+B)(A+C)</button>
+    </div>
+    <div class="md1-kbd">
+      <button class="kbd-var" onclick="md1Insert('bool-expr','A')">A</button>
+      <button class="kbd-var" onclick="md1Insert('bool-expr','B')">B</button>
+      <button class="kbd-var" onclick="md1Insert('bool-expr','C')">C</button>
+      <button class="kbd-var" onclick="md1Insert('bool-expr','D')">D</button>
+      <span style="width:4px"></span>
+      <button class="kbd-op" onclick="md1Insert('bool-expr','+')">+ (OR)</button>
+      <button class="kbd-op" onclick="md1Insert('bool-expr','·')">· (AND)</button>
+      <button class="kbd-op" onclick="md1Insert('bool-expr','¬')">¬ (NOT)</button>
+      <button class="kbd-op" onclick="md1Insert('bool-expr',"'")">' (NOT)</button>
+      <span style="width:4px"></span>
+      <button class="kbd-op" onclick="md1Insert('bool-expr','(')">(</button>
+      <button class="kbd-op" onclick="md1Insert('bool-expr',')')">)</button>
+      <button class="kbd-action" onclick="md1Clear('bool-expr')">C</button>
+      <button class="kbd-del" onclick="md1Back('bool-expr')">⌫</button>
+    </div>
+    <div id="bool-result" style="margin-top:12px"></div>
+    <div style="margin-top:16px;font-size:.85rem">
+      <h3 style="margin-bottom:8px">Axiomas del Álgebra de Boole (B, +, ·)</h3>
+      <table class="truth-table">
+        <tr><th>Axioma</th><th>Forma</th></tr>
+        <tr><td>1. Conmutativa</td><td>A+B = B+A &nbsp; | &nbsp; A·B = B·A</td></tr>
+        <tr><td>2. Asociativa</td><td>(A+B)+C = A+(B+C) &nbsp; | &nbsp; (A·B)·C = A·(B·C)</td></tr>
+        <tr><td>3. Elemento neutro</td><td>A+0 = A &nbsp; | &nbsp; A·1 = A</td></tr>
+        <tr><td>4. Distributiva</td><td>A·(B+C) = A·B + A·C &nbsp; | &nbsp; A+B·C = (A+B)·(A+C)</td></tr>
+        <tr><td>5. Complemento</td><td>A+¬A = 1 &nbsp; | &nbsp; A·¬A = 0</td></tr>
+      </table>
+    </div>
+    <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
+  `;
+  else if (tab === 'gates') c.innerHTML = `
+    <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
+    <p style="margin-bottom:8px">Compuertas lógicas básicas y su representación</p>
+    <div id="gates-content">
+      <div class="split">
+        <div class="result-box">
+          <h3>NOT (Inversor)</h3>
+          <pre style="font-size:.7rem;line-height:1.2;font-family:monospace">
+  A ──┤==o──  ¬A
+          </pre>
+          <table class="truth-table" style="margin-top:4px">
+            <tr><th>A</th><th>¬A</th></tr>
+            <tr><td>0</td><td class="tv">1</td></tr>
+            <tr><td>1</td><td class="tf">0</td></tr>
+          </table>
+        </div>
+        <div class="result-box">
+          <h3>AND</h3>
+          <pre style="font-size:.7rem;line-height:1.2;font-family:monospace">
+  A ──┤&  ├──  A·B
+  B ──┤   │
+          </pre>
+          <table class="truth-table" style="margin-top:4px">
+            <tr><th>A</th><th>B</th><th>A·B</th></tr>
+            <tr><td>0</td><td>0</td><td class="tf">0</td></tr>
+            <tr><td>0</td><td>1</td><td class="tf">0</td></tr>
+            <tr><td>1</td><td>0</td><td class="tf">0</td></tr>
+            <tr><td>1</td><td>1</td><td class="tv">1</td></tr>
+          </table>
+        </div>
+        <div class="result-box">
+          <h3>OR</h3>
+          <pre style="font-size:.7rem;line-height:1.2;font-family:monospace">
+  A ──┤≥1 ├──  A+B
+  B ──┤   │
+          </pre>
+          <table class="truth-table" style="margin-top:4px">
+            <tr><th>A</th><th>B</th><th>A+B</th></tr>
+            <tr><td>0</td><td>0</td><td class="tf">0</td></tr>
+            <tr><td>0</td><td>1</td><td class="tv">1</td></tr>
+            <tr><td>1</td><td>0</td><td class="tv">1</td></tr>
+            <tr><td>1</td><td>1</td><td class="tv">1</td></tr>
+          </table>
+        </div>
+        <div class="result-box">
+          <h3>NAND</h3>
+          <pre style="font-size:.7rem;line-height:1.2;font-family:monospace">
+  A ──┤&  o──  ¬(A·B)
+  B ──┤   │
+          </pre>
+          <table class="truth-table" style="margin-top:4px">
+            <tr><th>A</th><th>B</th><th>¬(A·B)</th></tr>
+            <tr><td>0</td><td>0</td><td class="tv">1</td></tr>
+            <tr><td>0</td><td>1</td><td class="tv">1</td></tr>
+            <tr><td>1</td><td>0</td><td class="tv">1</td></tr>
+            <tr><td>1</td><td>1</td><td class="tf">0</td></tr>
+          </table>
+        </div>
+        <div class="result-box">
+          <h3>NOR</h3>
+          <pre style="font-size:.7rem;line-height:1.2;font-family:monospace">
+  A ──┤≥1 o──  ¬(A+B)
+  B ──┤   │
+          </pre>
+          <table class="truth-table" style="margin-top:4px">
+            <tr><th>A</th><th>B</th><th>¬(A+B)</th></tr>
+            <tr><td>0</td><td>0</td><td class="tv">1</td></tr>
+            <tr><td>0</td><td>1</td><td class="tf">0</td></tr>
+            <tr><td>1</td><td>0</td><td class="tf">0</td></tr>
+            <tr><td>1</td><td>1</td><td class="tf">0</td></tr>
+          </table>
+        </div>
+        <div class="result-box">
+          <h3>XOR</h3>
+          <pre style="font-size:.7rem;line-height:1.2;font-family:monospace">
+  A ──┤=1 ├──  A⊕B
+  B ──┤   │
+          </pre>
+          <table class="truth-table" style="margin-top:4px">
+            <tr><th>A</th><th>B</th><th>A⊕B</th></tr>
+            <tr><td>0</td><td>0</td><td class="tf">0</td></tr>
+            <tr><td>0</td><td>1</td><td class="tv">1</td></tr>
+            <tr><td>1</td><td>0</td><td class="tv">1</td></tr>
+            <tr><td>1</td><td>1</td><td class="tf">0</td></tr>
+          </table>
+        </div>
+        <div class="result-box">
+          <h3>XNOR</h3>
+          <pre style="font-size:.7rem;line-height:1.2;font-family:monospace">
+  A ──┤=1 o──  ¬(A⊕B)
+  B ──┤   │
+          </pre>
+          <table class="truth-table" style="margin-top:4px">
+            <tr><th>A</th><th>B</th><th>¬(A⊕B)</th></tr>
+            <tr><td>0</td><td>0</td><td class="tv">1</td></tr>
+            <tr><td>0</td><td>1</td><td class="tf">0</td></tr>
+            <tr><td>1</td><td>0</td><td class="tf">0</td></tr>
+            <tr><td>1</td><td>1</td><td class="tv">1</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
+  `;
+  else if (tab === 'intro') c.innerHTML = `
+    <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
+    <p style="margin-bottom:12px"><b>Introducción a la Lógica y Matemática Discreta</b></p>
+    <div style="font-size:.85rem;line-height:1.8">
+      <div class="result-box" style="margin-bottom:12px">
+        <h3>📖 ¿Qué es la Matemática Discreta?</h3>
+        <p style="font-weight:400">Rama de las matemáticas que estudia elementos <b>discretos</b> (contables, separados), a diferencia del cálculo que estudia lo continuo. Incluye lógica, teoría de conjuntos, combinatoria, grafos y álgebra booleana.</p>
+      </div>
+      <div class="result-box" style="margin-bottom:12px">
+        <h3>📖 ¿Qué es una Proposición?</h3>
+        <p style="font-weight:400">Una <b>proposición</b> es una oración declarativa que puede ser <b>verdadera</b> o <b>falsa</b>, pero no ambas a la vez. Ej: "2 + 2 = 4" (V), "5 es menor que 3" (F).</p>
+      </div>
+      <div class="result-box" style="margin-bottom:12px">
+        <h3>📖 Conectivos Lógicos</h3>
+        <p style="font-weight:400">
+          <b>¬</b> Negación (NO) &nbsp;|&nbsp;
+          <b>∧</b> Conjunción (Y) &nbsp;|&nbsp;
+          <b>∨</b> Disyunción (O) &nbsp;|&nbsp;
+          <b>⊕</b> Disyunción Exclusiva (XOR) &nbsp;|&nbsp;
+          <b>→</b> Condicional (SI...ENTONCES) &nbsp;|&nbsp;
+          <b>↔</b> Bicondicional (SI Y SOLO SI)
+        </p>
+      </div>
+    </div>
+    <h3 style="margin:16px 0 8px">🧩 Acertijos de Lógica</h3>
+    <div id="puzzles">
+      <div class="result-box" style="margin-bottom:8px">
+        <p><b>1. El código de la caja fuerte</b></p>
+        <p style="font-weight:400;font-size:.85rem">Una caja fuerte tiene un código de 5 dígitos (0-9). Sabes que:<br>
+        • El tercer dígito es el doble del primero.<br>
+        • El segundo es igual al cuarto.<br>
+        • La suma del cuarto y el quinto es 10.<br>
+        • La suma de todos los dígitos es 23.<br>
+        • Ningún dígito se repite (excepto 2do y 4to).</p>
+        <button class="btn btn-secondary" style="font-size:.8rem;padding:4px 10px;margin-top:6px" onclick="this.nextElementSibling.style.display='block'">Mostrar solución</button>
+        <div style="display:none;margin-top:6px;padding:8px;background:#f0fdf4;border-radius:6px;font-size:.85rem"><b>Solución:</b> Códigos posibles: <b>26958</b>, <b>34857</b> (verificar con condiciones)</div>
+      </div>
+      <div class="result-box" style="margin-bottom:8px">
+        <p><b>2. El enigma de las edades</b></p>
+        <p style="font-weight:400;font-size:.85rem">Tres amigos (Ana, Beto y Carlos) tienen edades diferentes.<br>
+        • La suma de sus edades es 72 años.<br>
+        • Ana es 6 años mayor que Beto.<br>
+        • Carlos es el mayor, y su edad es el doble que la de Beto.</p>
+        <button class="btn btn-secondary" style="font-size:.8rem;padding:4px 10px;margin-top:6px" onclick="this.nextElementSibling.style.display='block'">Mostrar solución</button>
+        <div style="display:none;margin-top:6px;padding:8px;background:#f0fdf4;border-radius:6px;font-size:.85rem"><b>Solución:</b> Ana = 24, Beto = 18, Carlos = 36. (24+18+36=72, 24=18+6, 36=2·18)</div>
+      </div>
+      <div class="result-box" style="margin-bottom:8px">
+        <p><b>3. Rompecabezas de los colores</b></p>
+        <p style="font-weight:400;font-size:.85rem">Laura, Pedro, María y Juan viven en ese orden en casas de colores distintos (Azul, verde, rojo y amarillo). Cada uno tiene una mascota diferente (Perro, gato, pájaro y pez).<br>
+        • Laura no vive en la casa roja ni tiene pez.<br>
+        • Pedro tiene un perro y es vecino de la casa verde.<br>
+        • La casa azul está al lado de la casa del pájaro.<br>
+        • María vive en la casa amarilla.<br>
+        • Juan no tiene un gato.</p>
+        <button class="btn btn-secondary" style="font-size:.8rem;padding:4px 10px;margin-top:6px" onclick="this.nextElementSibling.style.display='block'">Mostrar solución</button>
+        <div style="display:none;margin-top:6px;padding:8px;background:#f0fdf4;border-radius:6px;font-size:.85rem"><b>Solución:</b> Laura - Verde - Pájaro, Pedro - Rojo - Perro, María - Amarillo - Gato, Juan - Azul - Pez</div>
+      </div>
+    </div>
+    <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
+  `;
   else if (tab === 'proof') c.innerHTML = `
     <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
     <p style="margin-bottom:8px">Asistente de demostración lógica</p>
@@ -634,6 +837,52 @@ function md1Tab(tab) {
     </div>
     <div class="ad-banner"><div class="ad-placeholder">— Publicidad —</div></div>
   `;
+}
+
+function boolTokenize(s) {
+  const t = []; let i = 0;
+  while (i < s.length) {
+    if (s[i] === ' ') { i++; continue; }
+    if ('()'.includes(s[i])) { t.push(s[i]); i++; continue; }
+    if (/[A-D]/.test(s[i])) { t.push(s[i]); i++; continue; }
+    if (s[i] === '¬' || s[i] === "'") { t.push('¬'); i++; continue; }
+    if (s[i] === '·' || s[i] === '*') { t.push('∧'); i++; continue; }
+    if (s[i] === '+') { t.push('∨'); i++; continue; }
+    i++;
+  }
+  return t;
+}
+
+function boolEval() {
+  const expr = $("bool-expr").value.trim();
+  if (!expr) return;
+  let s = expr.replace(/·/g, '∧').replace(/\+/g, '∨').replace(/'/g, '¬');
+  const tokens = boolTokenize(expr);
+  const pf = md1ToPostfix(tokens);
+  const vars = [...new Set(tokens.filter(t => /[A-D]/.test(t)))].sort();
+  if (vars.length > 4) { $("bool-result").innerHTML = '<div class="result-box error">Máximo 4 variables (A,B,C,D)</div>'; return; }
+  const rows = 2 ** vars.length;
+  let html = '<table class="truth-table"><thead><tr>';
+  for (const v of vars) html += `<th>${v}</th>`;
+  html += `<th>${expr}</th></tr></thead><tbody>`;
+  for (let i = 0; i < rows; i++) {
+    const vals = {};
+    html += '<tr>';
+    for (let j = 0; j < vars.length; j++) {
+      vals[vars[j]] = !!(i & (1 << (vars.length - 1 - j)));
+      html += `<td>${vals[vars[j]] ? '1' : '0'}</td>`;
+    }
+    html += `<td class="${md1EvalPF(pf,vals) ? 'tv' : 'tf'}">${md1EvalPF(pf,vals) ? '1' : '0'}</td></tr>`;
+  }
+  html += '</tbody></table>';
+  const allVals = Array.from({length: rows}, (_, i) => {
+    const vals = {};
+    for (let j = 0; j < vars.length; j++) vals[vars[j]] = !!(i & (1 << (vars.length - 1 - j)));
+    return md1EvalPF(pf, vals);
+  });
+  if (rows > 0 && allVals.every(Boolean)) html += '<div class="result-box" style="margin-top:8px;background:#d1fae5;color:#065f46">✅ Siempre verdadero (1) — tautología</div>';
+  if (rows > 0 && allVals.every(x => !x)) html += '<div class="result-box" style="margin-top:8px;background:#fee2e2;color:#991b1b">❌ Siempre falso (0)</div>';
+  $("bool-result").innerHTML = html;
 }
 
 function md1SetExpr(e) { $("md1-expr").value = e; md1Truth(); }

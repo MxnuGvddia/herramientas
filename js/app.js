@@ -64,6 +64,7 @@ window.addEventListener("hashchange", () => {
 });
 
 homePage();
+document.getElementById('loader-overlay').classList.add('loaded');
 
 
 function calcTab(tab) {
